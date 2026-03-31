@@ -1,0 +1,1052 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Stats Lab — bradywhite.dev</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500;700&family=Lora:ital,wght@0,400;1,400&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg: #f5f2eb;
+  --ink: #1a1a18;
+  --muted: #7a7870;
+  --surface: #edeae0;
+  --border: #d4d0c4;
+  --accent: #c84b1f;
+  --accent2: #1f6bc8;
+  --green: #1a7a4a;
+  --rule: 1px solid var(--border);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Lora', Georgia, serif;
+  min-height: 100vh;
+}
+
+/* MASTHEAD */
+.masthead {
+  border-bottom: 3px double var(--ink);
+  padding: 28px 40px 20px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.masthead-left a {
+  font-family: 'Syne', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+  text-decoration: none;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.masthead-left a:hover { color: var(--accent); }
+
+.masthead-title {
+  text-align: center;
+  flex: 1;
+}
+
+.masthead-title h1 {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(28px, 5vw, 52px);
+  font-weight: 800;
+  letter-spacing: -1px;
+  line-height: 1;
+}
+
+.masthead-title .sub {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 2px;
+  margin-top: 6px;
+  text-transform: uppercase;
+}
+
+.masthead-right {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  color: var(--muted);
+  text-align: right;
+}
+
+/* NAV STRIP */
+.nav-strip {
+  border-bottom: var(--rule);
+  padding: 0 40px;
+  display: flex;
+  gap: 0;
+}
+
+.nav-tab {
+  font-family: 'Syne', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  padding: 12px 20px;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -1px;
+  color: var(--muted);
+  transition: all 0.15s;
+  text-transform: uppercase;
+  user-select: none;
+}
+
+.nav-tab:hover { color: var(--ink); }
+.nav-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+/* LAYOUT */
+.page { max-width: 1100px; margin: 0 auto; padding: 40px 40px; }
+
+/* PANEL */
+.panel { display: none; }
+.panel.active { display: block; }
+
+/* SECTION HEADERS */
+.section-rule {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.section-rule h2 {
+  font-family: 'Syne', sans-serif;
+  font-size: 22px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.section-rule::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--ink);
+}
+
+/* SEARCH BAR */
+.search-row {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+}
+
+.search-input {
+  flex: 1;
+  min-width: 200px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 14px;
+  padding: 10px 16px;
+  border: var(--rule);
+  border-left: 3px solid var(--accent);
+  background: white;
+  color: var(--ink);
+  outline: none;
+}
+
+.search-input:focus { border-left-color: var(--accent2); }
+
+.btn {
+  font-family: 'Syne', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  padding: 10px 22px;
+  border: 2px solid var(--ink);
+  background: var(--ink);
+  color: var(--bg);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.btn:hover { background: var(--accent); border-color: var(--accent); }
+.btn.secondary { background: transparent; color: var(--ink); }
+.btn.secondary:hover { background: var(--ink); color: var(--bg); }
+
+/* TABLE */
+.table-wrap {
+  overflow-x: auto;
+  border: var(--rule);
+  background: white;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+thead tr {
+  border-bottom: 2px solid var(--ink);
+  background: var(--surface);
+}
+
+thead th {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding: 10px 14px;
+  text-align: left;
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+}
+
+thead th:hover { color: var(--accent); }
+thead th.sorted { color: var(--accent); }
+thead th.sorted::after { content: ' ↓'; }
+thead th.sorted.asc::after { content: ' ↑'; }
+
+tbody tr {
+  border-bottom: var(--rule);
+  transition: background 0.1s;
+}
+
+tbody tr:hover { background: var(--surface); }
+tbody tr:last-child { border-bottom: none; }
+
+tbody td {
+  padding: 10px 14px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+tbody td.team-name {
+  font-family: 'Syne', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  font-size: 10px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-weight: 700;
+  border-radius: 2px;
+}
+
+.badge-green { background: #d4edda; color: var(--green); }
+.badge-red { background: #fde8e0; color: var(--accent); }
+.badge-blue { background: #ddeeff; color: var(--accent2); }
+
+/* RATING BAR */
+.rating-bar-wrap { display: flex; align-items: center; gap: 8px; }
+.rating-bar {
+  height: 6px;
+  border-radius: 2px;
+  background: var(--border);
+  flex: 1;
+  max-width: 80px;
+}
+.rating-bar-fill { height: 100%; border-radius: 2px; background: var(--accent); }
+
+/* LOADING / EMPTY */
+.state-msg {
+  padding: 60px 24px;
+  text-align: center;
+  color: var(--muted);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 13px;
+}
+
+.spinner {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  margin-bottom: 12px;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* STATS GRID */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 1px;
+  background: var(--border);
+  border: var(--rule);
+  margin-bottom: 32px;
+}
+
+.stat-cell {
+  background: white;
+  padding: 20px 18px;
+}
+
+.stat-cell-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+.stat-cell-value {
+  font-family: 'Syne', sans-serif;
+  font-size: 28px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+/* CSV SECTION */
+.upload-zone {
+  border: 2px dashed var(--border);
+  background: white;
+  padding: 48px 32px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+  margin-bottom: 24px;
+}
+
+.upload-zone:hover, .upload-zone.drag { border-color: var(--accent); background: #fff8f6; }
+
+.upload-icon { font-size: 36px; margin-bottom: 12px; }
+
+.upload-title {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 16px;
+  margin-bottom: 6px;
+}
+
+.upload-sub {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.upload-sub a { color: var(--accent); cursor: pointer; }
+
+.format-note {
+  background: var(--surface);
+  border-left: 3px solid var(--accent2);
+  padding: 16px 20px;
+  margin-bottom: 28px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  line-height: 1.7;
+  color: var(--muted);
+}
+
+.format-note strong { color: var(--ink); }
+
+/* DETAIL MODAL */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(26,26,24,0.6);
+  z-index: 100;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-overlay.open { display: flex; }
+
+.modal {
+  background: var(--bg);
+  border: 2px solid var(--ink);
+  max-width: 520px;
+  width: 90%;
+  max-height: 85vh;
+  overflow-y: auto;
+  padding: 32px;
+  position: relative;
+}
+
+.modal-close {
+  position: absolute;
+  top: 16px; right: 16px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 18px;
+  cursor: pointer;
+  color: var(--muted);
+  border: none;
+  background: none;
+  line-height: 1;
+}
+
+.modal-close:hover { color: var(--accent); }
+
+.modal-team {
+  font-family: 'Syne', sans-serif;
+  font-size: 28px;
+  font-weight: 800;
+  margin-bottom: 4px;
+}
+
+.modal-conf {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  margin-bottom: 24px;
+}
+
+.modal-stat-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: var(--rule);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 13px;
+}
+
+.modal-stat-row:last-child { border-bottom: none; }
+.modal-stat-label { color: var(--muted); }
+.modal-stat-value { font-weight: 700; }
+
+/* RESPONSIVE */
+@media (max-width: 640px) {
+  .masthead { padding: 20px; flex-direction: column; align-items: center; text-align: center; }
+  .masthead-right { display: none; }
+  .nav-strip { padding: 0 16px; overflow-x: auto; }
+  .page { padding: 24px 16px; }
+}
+</style>
+</head>
+<body>
+
+<!-- MASTHEAD -->
+<div class="masthead">
+  <div class="masthead-left">
+    <a href="/">← bradywhite.dev</a>
+  </div>
+  <div class="masthead-title">
+    <h1>STATS LAB</h1>
+    <div class="sub">College Basketball Analytics · Baseline Logic</div>
+  </div>
+  <div class="masthead-right">
+    <div id="live-date">—</div>
+    <div style="margin-top:4px; color:var(--accent); font-weight:700">LIVE DATA</div>
+  </div>
+</div>
+
+<!-- NAV -->
+<div class="nav-strip">
+  <div class="nav-tab active" onclick="switchTab('teams')">Team Stats</div>
+  <div class="nav-tab" onclick="switchTab('efficiency')">Efficiency Ratings</div>
+  <div class="nav-tab" onclick="switchTab('csv')">Upload Your Data</div>
+</div>
+
+<div class="page">
+
+  <!-- ======= TEAMS PANEL ======= -->
+  <div class="panel active" id="panel-teams">
+    <div class="section-rule"><h2>Team Stats Explorer</h2></div>
+
+    <div class="search-row">
+      <input class="search-input" id="team-search" placeholder="Search team name..." oninput="filterTeams()"/>
+      <select class="search-input" id="conf-filter" style="flex:0;min-width:160px;" onchange="filterTeams()">
+        <option value="">All Conferences</option>
+      </select>
+      <button class="btn secondary" onclick="loadTeams()">↺ Refresh</button>
+    </div>
+
+    <div id="teams-summary" class="stats-grid" style="display:none"></div>
+
+    <div class="table-wrap">
+      <div id="teams-state" class="state-msg">
+        <div class="spinner"></div><br>Loading team data from ESPN...
+      </div>
+      <table id="teams-table" style="display:none">
+        <thead>
+          <tr>
+            <th onclick="sortTable('teams','rank')">#</th>
+            <th onclick="sortTable('teams','name')">Team</th>
+            <th onclick="sortTable('teams','conf')">Conf</th>
+            <th onclick="sortTable('teams','wins')">W</th>
+            <th onclick="sortTable('teams','losses')">L</th>
+            <th onclick="sortTable('teams','pct')">Win%</th>
+            <th onclick="sortTable('teams','ppg')">PPG</th>
+            <th onclick="sortTable('teams','oppg')">OPP PPG</th>
+            <th onclick="sortTable('teams','diff')">Diff</th>
+            <th>Details</th>
+          </tr>
+        </thead>
+        <tbody id="teams-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ======= EFFICIENCY PANEL ======= -->
+  <div class="panel" id="panel-efficiency">
+    <div class="section-rule"><h2>Efficiency Ratings</h2></div>
+    <p style="font-family:'Lora',serif; color:var(--muted); margin-bottom:24px; font-style:italic; font-size:14px;">
+      Efficiency ratings derived from ESPN team data. Offensive efficiency = points scored relative to pace. Defensive efficiency = points allowed. Net efficiency is the primary ranking signal.
+    </p>
+
+    <div class="search-row">
+      <input class="search-input" id="eff-search" placeholder="Search team..." oninput="filterEfficiency()"/>
+      <button class="btn secondary" onclick="renderEfficiency()">↺ Refresh</button>
+    </div>
+
+    <div class="table-wrap">
+      <div id="eff-state" class="state-msg">Load Team Stats first to populate efficiency ratings.</div>
+      <table id="eff-table" style="display:none">
+        <thead>
+          <tr>
+            <th onclick="sortTable('eff','rank')">#</th>
+            <th onclick="sortTable('eff','name')">Team</th>
+            <th onclick="sortTable('eff','conf')">Conf</th>
+            <th onclick="sortTable('eff','offEff')">Off. Eff</th>
+            <th onclick="sortTable('eff','defEff')">Def. Eff</th>
+            <th onclick="sortTable('eff','netEff')">Net Eff</th>
+            <th onclick="sortTable('eff','wpi')">WPI Score</th>
+            <th>Rating</th>
+          </tr>
+        </thead>
+        <tbody id="eff-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ======= CSV PANEL ======= -->
+  <div class="panel" id="panel-csv">
+    <div class="section-rule"><h2>Upload Your Data</h2></div>
+    <p style="font-family:'Lora',serif; color:var(--muted); margin-bottom:24px; font-style:italic; font-size:14px;">
+      Drop in your own game or player CSV and get instant efficiency ratings. Works for coaches, analysts, or anyone tracking a team.
+    </p>
+
+    <div class="format-note">
+      <strong>Expected columns (player CSV):</strong> player, team, gp, min, pts, reb, ast, stl, blk, tov, fga, fgm, fta, ftm<br>
+      <strong>Expected columns (team CSV):</strong> team, gp, wins, losses, pts, opp_pts, fga, fgm, fta, ftm, reb, ast, tov<br>
+      <strong>Tip:</strong> Column names are flexible — the tool will try to match common variations.
+    </div>
+
+    <div class="upload-zone" id="upload-zone" onclick="document.getElementById('csv-file').click()"
+      ondragover="event.preventDefault(); this.classList.add('drag')"
+      ondragleave="this.classList.remove('drag')"
+      ondrop="handleDrop(event)">
+      <div class="upload-icon">📂</div>
+      <div class="upload-title">Drop CSV here or click to browse</div>
+      <div class="upload-sub">Supports .csv files up to 5MB · <a>Download sample template</a></div>
+    </div>
+    <input type="file" id="csv-file" accept=".csv" style="display:none" onchange="handleCSV(this.files[0])"/>
+
+    <div id="csv-state" class="state-msg" style="display:none"></div>
+
+    <div id="csv-results" style="display:none">
+      <div id="csv-summary" class="stats-grid" style="margin-bottom:32px;"></div>
+      <div class="section-rule"><h2 style="font-size:18px;" id="csv-table-title">Results</h2></div>
+      <div class="table-wrap">
+        <table id="csv-table">
+          <thead><tr id="csv-thead"></tr></thead>
+          <tbody id="csv-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-team" id="modal-team">—</div>
+    <div class="modal-conf" id="modal-conf">—</div>
+    <div id="modal-stats"></div>
+  </div>
+</div>
+
+<script>
+// ─── STATE ───────────────────────────────────────────────
+let allTeams = [];
+let effData = [];
+let sortState = { teams: { col: 'wins', dir: 'desc' }, eff: { col: 'netEff', dir: 'desc' } };
+
+// ─── INIT ────────────────────────────────────────────────
+document.getElementById('live-date').textContent = new Date().toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
+loadTeams();
+
+// ─── TABS ────────────────────────────────────────────────
+function switchTab(name) {
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('panel-' + name).classList.add('active');
+  if (name === 'efficiency' && allTeams.length > 0) renderEfficiency();
+}
+
+// ─── ESPN API ────────────────────────────────────────────
+async function loadTeams() {
+  setState('teams', 'loading', 'Loading team data from ESPN...');
+  document.getElementById('teams-table').style.display = 'none';
+  document.getElementById('teams-summary').style.display = 'none';
+
+  try {
+    // Fetch top teams with stats
+    const res = await fetch('https://site.api.espn.com/apis/site/v2/sports/basketball/mens-college-basketball/teams?limit=100&groups=50');
+    const data = await res.json();
+
+    const teams = data.sports[0].leagues[0].teams;
+
+    // Fetch records for each team in parallel (batch of first 100)
+    const enriched = await Promise.all(
+      teams.slice(0, 100).map(async (entry) => {
+        const t = entry.team;
+        try {
+          const r2 = await fetch(`https://site.api.espn.com/apis/site/v2/sports/basketball/mens-college-basketball/teams/${t.id}`);
+          const d2 = await r2.json();
+          const rec = d2.team?.record?.items?.[0]?.stats || [];
+          const getStat = (name) => {
+            const s = rec.find(x => x.name === name);
+            return s ? parseFloat(s.value) : null;
+          };
+          return {
+            id: t.id,
+            name: t.displayName || t.name,
+            abbr: t.abbreviation,
+            conf: d2.team?.groups?.parent?.name || d2.team?.groups?.name || '—',
+            wins: getStat('wins') || 0,
+            losses: getStat('losses') || 0,
+            ppg: getStat('avgPoints') || getStat('pointsFor') || null,
+            oppg: getStat('avgPointsAllowed') || getStat('pointsAgainst') || null,
+          };
+        } catch(e) {
+          return {
+            id: t.id, name: t.displayName || t.name, abbr: t.abbreviation,
+            conf: '—', wins: 0, losses: 0, ppg: null, oppg: null
+          };
+        }
+      })
+    );
+
+    allTeams = enriched
+      .filter(t => t.wins + t.losses > 0)
+      .map(t => ({
+        ...t,
+        pct: t.wins + t.losses > 0 ? t.wins / (t.wins + t.losses) : 0,
+        diff: (t.ppg && t.oppg) ? +(t.ppg - t.oppg).toFixed(1) : null
+      }))
+      .sort((a, b) => b.wins - a.wins);
+
+    populateConferences();
+    renderTeams(allTeams);
+    renderSummary(allTeams);
+    buildEfficiencyData();
+
+  } catch(e) {
+    setState('teams', 'error', '⚠ Could not load ESPN data. Check your connection and try again.');
+    console.error(e);
+  }
+}
+
+function populateConferences() {
+  const confs = [...new Set(allTeams.map(t => t.conf).filter(c => c !== '—'))].sort();
+  const sel = document.getElementById('conf-filter');
+  sel.innerHTML = '<option value="">All Conferences</option>';
+  confs.forEach(c => {
+    const o = document.createElement('option');
+    o.value = c; o.textContent = c;
+    sel.appendChild(o);
+  });
+}
+
+function renderTeams(data) {
+  if (!data.length) { setState('teams', 'msg', 'No teams match your search.'); return; }
+
+  setState('teams', 'clear');
+  const tbody = document.getElementById('teams-body');
+  tbody.innerHTML = '';
+
+  data.forEach((t, i) => {
+    const tr = document.createElement('tr');
+    tr.style.cursor = 'pointer';
+    tr.onclick = () => openModal(t);
+
+    const diff = t.diff !== null ? (t.diff > 0 ? `<span style="color:var(--green)">+${t.diff}</span>` : `<span style="color:var(--accent)">${t.diff}</span>`) : '—';
+    const pctBadge = t.pct >= 0.7 ? 'badge-green' : t.pct >= 0.5 ? 'badge-blue' : 'badge-red';
+
+    tr.innerHTML = `
+      <td>${i + 1}</td>
+      <td class="team-name">${t.name}</td>
+      <td style="color:var(--muted);font-size:11px">${t.conf}</td>
+      <td style="color:var(--green);font-weight:700">${t.wins}</td>
+      <td>${t.losses}</td>
+      <td><span class="badge ${pctBadge}">${(t.pct * 100).toFixed(1)}%</span></td>
+      <td>${t.ppg !== null ? t.ppg.toFixed(1) : '—'}</td>
+      <td>${t.oppg !== null ? t.oppg.toFixed(1) : '—'}</td>
+      <td>${diff}</td>
+      <td style="color:var(--accent2);font-size:11px;cursor:pointer">View →</td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  document.getElementById('teams-table').style.display = 'table';
+}
+
+function renderSummary(data) {
+  const valid = data.filter(t => t.ppg && t.oppg);
+  if (!valid.length) return;
+  const avgPPG = (valid.reduce((s,t) => s+t.ppg, 0) / valid.length).toFixed(1);
+  const avgDiff = (valid.reduce((s,t) => s+t.diff, 0) / valid.length).toFixed(1);
+  const topTeam = [...data].sort((a,b) => b.pct - a.pct)[0];
+
+  const el = document.getElementById('teams-summary');
+  el.style.display = 'grid';
+  el.innerHTML = `
+    <div class="stat-cell">
+      <div class="stat-cell-label">Teams Loaded</div>
+      <div class="stat-cell-value">${data.length}</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-cell-label">Avg PPG</div>
+      <div class="stat-cell-value">${avgPPG}</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-cell-label">Avg Point Diff</div>
+      <div class="stat-cell-value" style="color:${avgDiff > 0 ? 'var(--green)':'var(--accent)'}">${avgDiff > 0 ? '+' : ''}${avgDiff}</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-cell-label">Best Win%</div>
+      <div class="stat-cell-value" style="font-size:18px">${topTeam?.name || '—'}</div>
+    </div>
+  `;
+}
+
+function filterTeams() {
+  const q = document.getElementById('team-search').value.toLowerCase();
+  const conf = document.getElementById('conf-filter').value;
+  const filtered = allTeams.filter(t =>
+    t.name.toLowerCase().includes(q) &&
+    (conf === '' || t.conf === conf)
+  );
+  renderTeams(filtered);
+}
+
+// ─── EFFICIENCY ──────────────────────────────────────────
+function buildEfficiencyData() {
+  if (!allTeams.length) return;
+  const valid = allTeams.filter(t => t.ppg && t.oppg && t.wins + t.losses > 0);
+
+  const maxPPG = Math.max(...valid.map(t => t.ppg));
+  const minOPPG = Math.min(...valid.map(t => t.oppg));
+
+  effData = valid.map(t => {
+    // Simplified efficiency: normalize PPG and OPPG, compute net
+    const offEff = +(t.ppg / maxPPG * 100).toFixed(1);
+    const defEff = +((1 - (t.oppg - minOPPG) / (Math.max(...valid.map(x=>x.oppg)) - minOPPG)) * 100).toFixed(1);
+    const netEff = +(t.diff || 0);
+    // WPI: weighted formula (win% 40%, net eff 35%, off eff 15%, def eff 10%)
+    const wpi = +(t.pct * 40 + (netEff + 20) * 0.7 + offEff * 0.15 + defEff * 0.10).toFixed(1);
+    return { ...t, offEff, defEff, netEff, wpi };
+  }).sort((a, b) => b.wpi - a.wpi);
+}
+
+function renderEfficiency() {
+  if (!allTeams.length) {
+    setState('eff', 'msg', 'Load Team Stats first — click the Team Stats tab and wait for data to load.');
+    return;
+  }
+  buildEfficiencyData();
+  filterEfficiency();
+}
+
+function filterEfficiency() {
+  const q = document.getElementById('eff-search').value.toLowerCase();
+  const filtered = effData.filter(t => t.name.toLowerCase().includes(q));
+  if (!filtered.length) { setState('eff', 'msg', 'No teams match.'); return; }
+
+  setState('eff', 'clear');
+  const tbody = document.getElementById('eff-body');
+  tbody.innerHTML = '';
+
+  filtered.forEach((t, i) => {
+    const netColor = t.netEff > 0 ? 'var(--green)' : 'var(--accent)';
+    const wpiColor = t.wpi >= 60 ? 'var(--green)' : t.wpi >= 45 ? 'var(--accent2)' : 'var(--muted)';
+    const barPct = Math.min(100, Math.max(0, (t.wpi - 20) / 60 * 100));
+
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${i + 1}</td>
+      <td class="team-name">${t.name}</td>
+      <td style="color:var(--muted);font-size:11px">${t.conf}</td>
+      <td>${t.offEff}</td>
+      <td>${t.defEff}</td>
+      <td style="color:${netColor};font-weight:700">${t.netEff > 0 ? '+' : ''}${t.netEff}</td>
+      <td style="color:${wpiColor};font-weight:700">${t.wpi}</td>
+      <td>
+        <div class="rating-bar-wrap">
+          <div class="rating-bar"><div class="rating-bar-fill" style="width:${barPct}%;background:${wpiColor}"></div></div>
+          <span style="font-size:10px;color:var(--muted)">${barPct.toFixed(0)}%</span>
+        </div>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  document.getElementById('eff-table').style.display = 'table';
+}
+
+// ─── CSV UPLOAD ──────────────────────────────────────────
+function handleDrop(e) {
+  e.preventDefault();
+  document.getElementById('upload-zone').classList.remove('drag');
+  const file = e.dataTransfer.files[0];
+  if (file && file.name.endsWith('.csv')) handleCSV(file);
+  else alert('Please drop a .csv file.');
+}
+
+function handleCSV(file) {
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => parseCSV(e.target.result, file.name);
+  reader.readAsText(file);
+}
+
+function parseCSV(text, filename) {
+  const lines = text.trim().split('\n').filter(l => l.trim());
+  if (lines.length < 2) { showCSVState('CSV appears empty or invalid.'); return; }
+
+  const raw_headers = lines[0].split(',').map(h => h.trim().toLowerCase().replace(/[^a-z0-9_]/g,''));
+  const rows = lines.slice(1).map(l => {
+    const vals = l.split(',').map(v => v.trim());
+    const obj = {};
+    raw_headers.forEach((h, i) => obj[h] = vals[i] || '');
+    return obj;
+  });
+
+  // Detect mode: player vs team
+  const isPlayer = raw_headers.some(h => ['player','name','playername'].includes(h));
+  isPlayer ? processPlayerCSV(rows, raw_headers) : processTeamCSV(rows, raw_headers);
+}
+
+function col(row, ...names) {
+  for (const n of names) if (row[n] !== undefined && row[n] !== '') return row[n];
+  return null;
+}
+
+function processPlayerCSV(rows, headers) {
+  const results = rows.map(r => {
+    const pts = parseFloat(col(r, 'pts','points','ppg')) || 0;
+    const reb = parseFloat(col(r, 'reb','rebounds','rpg','trb')) || 0;
+    const ast = parseFloat(col(r, 'ast','assists','apg')) || 0;
+    const stl = parseFloat(col(r, 'stl','steals','spg')) || 0;
+    const blk = parseFloat(col(r, 'blk','blocks','bpg')) || 0;
+    const tov = parseFloat(col(r, 'tov','to','turnovers')) || 0;
+    const fga = parseFloat(col(r, 'fga')) || 1;
+    const fgm = parseFloat(col(r, 'fgm','fg')) || 0;
+    const fta = parseFloat(col(r, 'fta')) || 1;
+    const ftm = parseFloat(col(r, 'ftm','ft')) || 0;
+    const min = parseFloat(col(r, 'min','minutes','mpg')) || 1;
+    const gp = parseFloat(col(r, 'gp','g','games')) || 1;
+
+    const fgPct = fga > 0 ? fgm/fga : 0;
+    const ftPct = fta > 0 ? ftm/fta : 0;
+    // PER-style: (pts + reb*1.2 + ast*1.5 + stl*2 + blk*2 - tov*1.5) normalized per 40 min
+    const rawPER = (pts + reb*1.2 + ast*1.5 + stl*2 + blk*2 - tov*1.5) / min * 40;
+    const per = +rawPER.toFixed(1);
+
+    return {
+      player: col(r,'player','name','playername') || '—',
+      team: col(r,'team','school') || '—',
+      gp, min: min.toFixed(1),
+      pts: pts.toFixed(1), reb: reb.toFixed(1), ast: ast.toFixed(1),
+      stl: stl.toFixed(1), blk: blk.toFixed(1), tov: tov.toFixed(1),
+      fgPct: (fgPct*100).toFixed(1)+'%',
+      ftPct: (ftPct*100).toFixed(1)+'%',
+      per
+    };
+  }).sort((a,b) => b.per - a.per);
+
+  const avgPER = (results.reduce((s,r) => s+r.per, 0)/results.length).toFixed(1);
+  const top = results[0];
+
+  showCSVResults(
+    [
+      { label: 'Players', value: results.length },
+      { label: 'Avg PER', value: avgPER },
+      { label: 'Top Player', value: top?.player || '—' },
+      { label: 'Top PER', value: top?.per || '—' },
+    ],
+    ['Rank','Player','Team','GP','Min','PPG','RPG','APG','STL','BLK','TO','FG%','FT%','PER'],
+    results.map((r,i) => [i+1, r.player, r.team, r.gp, r.min, r.pts, r.reb, r.ast, r.stl, r.blk, r.tov, r.fgPct, r.ftPct,
+      `<strong style="color:${r.per>=20?'var(--green)':r.per>=12?'var(--accent2)':'var(--muted)'}">${r.per}</strong>`
+    ]),
+    'Player Efficiency Ratings'
+  );
+}
+
+function processTeamCSV(rows, headers) {
+  const results = rows.map(r => {
+    const wins = parseFloat(col(r,'wins','w')) || 0;
+    const losses = parseFloat(col(r,'losses','l')) || 0;
+    const pts = parseFloat(col(r,'pts','points','ppg','pf')) || 0;
+    const opp = parseFloat(col(r,'opp_pts','opppts','pa','opp','pointsagainst')) || 0;
+    const fga = parseFloat(col(r,'fga')) || 1;
+    const fgm = parseFloat(col(r,'fgm','fg')) || 0;
+    const gp = wins + losses || 1;
+
+    const pct = wins/gp;
+    const diff = +(pts - opp).toFixed(1);
+    const fgPct = fga > 0 ? (fgm/fga*100).toFixed(1) : '—';
+    const wpi = +(pct*40 + diff*1.5 + (pts/opp)*5).toFixed(1);
+
+    return {
+      team: col(r,'team','school','name') || '—',
+      wins, losses,
+      pct: (pct*100).toFixed(1)+'%',
+      ppg: pts.toFixed(1), oppg: opp.toFixed(1),
+      diff, fgPct: fgPct+'%', wpi
+    };
+  }).sort((a,b) => b.wpi - a.wpi);
+
+  const top = results[0];
+  showCSVResults(
+    [
+      { label: 'Teams', value: results.length },
+      { label: 'Top WPI', value: top?.wpi || '—' },
+      { label: 'Best Team', value: top?.team || '—' },
+      { label: 'Best Record', value: top ? `${top.wins}-${top.losses}` : '—' }
+    ],
+    ['Rank','Team','W','L','Win%','PPG','OPP PPG','Diff','WPI Score'],
+    results.map((r,i) => [
+      i+1, `<strong>${r.team}</strong>`, r.wins, r.losses, r.pct, r.ppg, r.oppg,
+      `<span style="color:${r.diff>0?'var(--green)':'var(--accent)'}">${r.diff>0?'+':''}${r.diff}</span>`,
+      `<strong style="color:${r.wpi>=60?'var(--green)':r.wpi>=40?'var(--accent2)':'var(--muted)'}">${r.wpi}</strong>`
+    ]),
+    'Team WPI Rankings'
+  );
+}
+
+function showCSVResults(summaryItems, headers, rows, title) {
+  document.getElementById('csv-state').style.display = 'none';
+  document.getElementById('upload-zone').style.display = 'none';
+  document.querySelector('.format-note').style.display = 'none';
+
+  const summEl = document.getElementById('csv-summary');
+  summEl.innerHTML = summaryItems.map(s => `
+    <div class="stat-cell">
+      <div class="stat-cell-label">${s.label}</div>
+      <div class="stat-cell-value" style="font-size:${String(s.value).length > 10 ? '16px' : '28px'}">${s.value}</div>
+    </div>
+  `).join('');
+
+  document.getElementById('csv-table-title').textContent = title;
+
+  document.getElementById('csv-thead').innerHTML = headers.map(h => `<th>${h}</th>`).join('');
+  document.getElementById('csv-body').innerHTML = rows.map(r =>
+    `<tr>${r.map(c => `<td>${c}</td>`).join('')}</tr>`
+  ).join('');
+
+  const resetBtn = document.createElement('button');
+  resetBtn.className = 'btn secondary';
+  resetBtn.textContent = '← Upload Another';
+  resetBtn.style.marginBottom = '24px';
+  resetBtn.onclick = resetCSV;
+
+  const results = document.getElementById('csv-results');
+  if (!results.querySelector('.btn')) results.prepend(resetBtn);
+  results.style.display = 'block';
+}
+
+function resetCSV() {
+  document.getElementById('csv-results').style.display = 'none';
+  document.getElementById('upload-zone').style.display = 'block';
+  document.querySelector('.format-note').style.display = 'block';
+  document.getElementById('csv-file').value = '';
+  const btn = document.querySelector('#csv-results .btn');
+  if (btn) btn.remove();
+}
+
+function showCSVState(msg) {
+  const el = document.getElementById('csv-state');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+// ─── MODAL ───────────────────────────────────────────────
+function openModal(t) {
+  document.getElementById('modal-team').textContent = t.name;
+  document.getElementById('modal-conf').textContent = t.conf;
+
+  const eff = effData.find(e => e.id === t.id);
+  const rows = [
+    ['Record', `${t.wins} — ${t.losses}`],
+    ['Win Percentage', (t.pct * 100).toFixed(1) + '%'],
+    ['Points Per Game', t.ppg ? t.ppg.toFixed(1) : '—'],
+    ['Opp. Points Per Game', t.oppg ? t.oppg.toFixed(1) : '—'],
+    ['Point Differential', t.diff !== null ? (t.diff > 0 ? '+' : '') + t.diff : '—'],
+    ...(eff ? [
+      ['Offensive Efficiency', eff.offEff],
+      ['Defensive Efficiency', eff.defEff],
+      ['Net Efficiency', (eff.netEff > 0 ? '+' : '') + eff.netEff],
+      ['WPI Score', eff.wpi],
+    ] : [])
+  ];
+
+  document.getElementById('modal-stats').innerHTML = rows.map(([label, val]) => `
+    <div class="modal-stat-row">
+      <span class="modal-stat-label">${label}</span>
+      <span class="modal-stat-value">${val}</span>
+    </div>
+  `).join('');
+
+  document.getElementById('modal').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('modal').classList.remove('open');
+}
+
+// ─── SORT ────────────────────────────────────────────────
+function sortTable(tableKey, col) {
+  const state = sortState[tableKey];
+  if (state.col === col) state.dir = state.dir === 'desc' ? 'asc' : 'desc';
+  else { state.col = col; state.dir = 'desc'; }
+
+  if (tableKey === 'teams') {
+    allTeams.sort((a, b) => {
+      const av = a[col] ?? -Infinity, bv = b[col] ?? -Infinity;
+      return state.dir === 'desc' ? (typeof av === 'string' ? av.localeCompare(bv) : bv - av)
+                                   : (typeof av === 'string' ? bv.localeCompare(av) : av - bv);
+    });
+    filterTeams();
+  } else {
+    effData.sort((a, b) => {
+      const av = a[col] ?? -Infinity, bv = b[col] ?? -Infinity;
+      return state.dir === 'desc' ? bv - av : av - bv;
+    });
+    filterEfficiency();
+  }
+}
+
+// ─── HELPERS ────────────────────────────────────────────
+function setState(panel, type, msg) {
+  const stateEl = document.getElementById(panel === 'teams' ? 'teams-state' : 'eff-state');
+  const tableEl = document.getElementById(panel === 'teams' ? 'teams-table' : 'eff-table');
+
+  if (type === 'clear') { stateEl.style.display = 'none'; tableEl.style.display = 'table'; return; }
+  tableEl.style.display = 'none';
+  stateEl.style.display = 'block';
+  stateEl.innerHTML = type === 'loading'
+    ? `<div class="spinner"></div><br>${msg}`
+    : msg;
+}
+</script>
+</body>
+</html>
