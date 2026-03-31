@@ -1,653 +1,1049 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Brady White — CBB Analytics</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    :root {
-      --ink: #0e0e0e;
-      --paper: #f4f1eb;
-      --accent: #c8410a;
-      --muted: #7a7468;
-      --line: #d4cfc6;
-      --court: #e8e0d0;
-    }
-
-    html { scroll-behavior: smooth; }
-
-    body {
-      font-family: 'DM Sans', sans-serif;
-      background: var(--paper);
-      color: var(--ink);
-      overflow-x: hidden;
-    }
-
-    /* ── NOISE TEXTURE OVERLAY ── */
-    body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-      pointer-events: none;
-      z-index: 1000;
-      opacity: 0.5;
-    }
-
-    /* ── HEADER ── */
-    header {
-      display: grid;
-      grid-template-columns: 1fr auto;
-      align-items: center;
-      padding: 28px 48px;
-      border-bottom: 1px solid var(--line);
-      animation: fadeDown 0.6s ease both;
-    }
-
-    .logo {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 22px;
-      letter-spacing: 0.06em;
-      color: var(--ink);
-      text-decoration: none;
-    }
-
-    nav { display: flex; gap: 32px; }
-    nav a {
-      font-size: 13px;
-      font-weight: 500;
-      letter-spacing: 0.04em;
-      color: var(--muted);
-      text-decoration: none;
-      transition: color 0.2s;
-    }
-    nav a:hover { color: var(--ink); }
-
-    /* ── HERO ── */
-    .hero {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      min-height: calc(100vh - 81px);
-      border-bottom: 1px solid var(--line);
-    }
-
-    .hero-left {
-      padding: 80px 48px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      border-right: 1px solid var(--line);
-      animation: fadeUp 0.8s 0.1s ease both;
-    }
-
-    .eyebrow {
-      font-family: 'DM Mono', monospace;
-      font-size: 11px;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--accent);
-      margin-bottom: 24px;
-    }
-
-    h1 {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: clamp(72px, 9vw, 120px);
-      line-height: 0.92;
-      letter-spacing: 0.01em;
-      color: var(--ink);
-      margin-bottom: 32px;
-    }
-
-    h1 span { color: var(--accent); }
-
-    .hero-desc {
-      font-size: 17px;
-      font-weight: 300;
-      line-height: 1.7;
-      color: var(--muted);
-      max-width: 440px;
-      margin-bottom: 48px;
-    }
-
-    .hero-desc strong { color: var(--ink); font-weight: 500; }
-
-    .cta-row { display: flex; gap: 14px; align-items: center; }
-
-    .btn-primary {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background: var(--ink);
-      color: var(--paper);
-      padding: 14px 28px;
-      font-size: 13px;
-      font-weight: 500;
-      letter-spacing: 0.04em;
-      text-decoration: none;
-      transition: background 0.2s, transform 0.15s;
-    }
-    .btn-primary:hover { background: var(--accent); transform: translateY(-1px); }
-
-    .btn-secondary {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      color: var(--muted);
-      font-size: 13px;
-      font-weight: 500;
-      letter-spacing: 0.04em;
-      text-decoration: none;
-      border-bottom: 1px solid var(--line);
-      padding-bottom: 2px;
-      transition: color 0.2s, border-color 0.2s;
-    }
-    .btn-secondary:hover { color: var(--ink); border-color: var(--ink); }
-
-    /* ── HERO RIGHT — COURT GRAPHIC ── */
-    .hero-right {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 48px;
-      background: var(--court);
-      position: relative;
-      overflow: hidden;
-      animation: fadeUp 0.8s 0.25s ease both;
-    }
-
-    .court-svg {
-      width: 100%;
-      max-width: 360px;
-      opacity: 0.18;
-    }
-
-    .stat-cards {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: flex-start;
-      padding: 48px;
-      gap: 16px;
-    }
-
-    .stat-card {
-      background: var(--paper);
-      border: 1px solid var(--line);
-      padding: 16px 20px;
-      min-width: 200px;
-      animation: slideIn 0.6s ease both;
-    }
-
-    .stat-card:nth-child(1) { animation-delay: 0.4s; margin-left: 0; }
-    .stat-card:nth-child(2) { animation-delay: 0.55s; margin-left: 32px; }
-    .stat-card:nth-child(3) { animation-delay: 0.7s; margin-left: 16px; }
-
-    .stat-num {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 36px;
-      color: var(--accent);
-      line-height: 1;
-      margin-bottom: 4px;
-    }
-
-    .stat-label {
-      font-size: 11px;
-      font-weight: 500;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--muted);
-    }
-
-    /* ── ABOUT ── */
-    #about {
-      display: grid;
-      grid-template-columns: 1fr 2fr;
-      border-bottom: 1px solid var(--line);
-      animation: fadeUp 0.8s ease both;
-    }
-
-    .section-num {
-      padding: 64px 48px;
-      border-right: 1px solid var(--line);
-      display: flex;
-      align-items: flex-start;
-    }
-
-    .section-num span {
-      font-family: 'DM Mono', monospace;
-      font-size: 12px;
-      color: var(--muted);
-      letter-spacing: 0.1em;
-    }
-
-    .section-content { padding: 64px 64px 64px 48px; }
-
-    .section-title {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 48px;
-      letter-spacing: 0.02em;
-      color: var(--ink);
-      margin-bottom: 28px;
-      line-height: 1;
-    }
-
-    .section-body {
-      font-size: 16px;
-      font-weight: 300;
-      line-height: 1.8;
-      color: var(--muted);
-      max-width: 560px;
-    }
-
-    .section-body strong { color: var(--ink); font-weight: 500; }
-
-    .tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 32px;
-    }
-
-    .tag {
-      font-family: 'DM Mono', monospace;
-      font-size: 11px;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--ink);
-      border: 1px solid var(--line);
-      padding: 6px 12px;
-    }
-
-    /* ── PROJECTS ── */
-    #projects {
-      border-bottom: 1px solid var(--line);
-    }
-
-    .projects-header {
-      display: grid;
-      grid-template-columns: 1fr 2fr;
-      border-bottom: 1px solid var(--line);
-    }
-
-    .project-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-    }
-
-    .project-card {
-      padding: 48px;
-      border-right: 1px solid var(--line);
-      border-bottom: 1px solid var(--line);
-      transition: background 0.2s;
-      cursor: default;
-    }
-
-    .project-card:nth-child(even) { border-right: none; }
-    .project-card:hover { background: var(--court); }
-
-    .project-num {
-      font-family: 'DM Mono', monospace;
-      font-size: 11px;
-      color: var(--accent);
-      letter-spacing: 0.1em;
-      margin-bottom: 20px;
-    }
-
-    .project-title {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 28px;
-      letter-spacing: 0.02em;
-      color: var(--ink);
-      margin-bottom: 12px;
-      line-height: 1.1;
-    }
-
-    .project-desc {
-      font-size: 14px;
-      font-weight: 300;
-      line-height: 1.7;
-      color: var(--muted);
-      margin-bottom: 20px;
-    }
-
-    .project-tech {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-
-    .tech-pill {
-      font-family: 'DM Mono', monospace;
-      font-size: 10px;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      color: var(--muted);
-      background: var(--line);
-      padding: 4px 8px;
-    }
-
-    .wip-badge {
-      display: inline-block;
-      font-family: 'DM Mono', monospace;
-      font-size: 10px;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--paper);
-      background: var(--accent);
-      padding: 4px 10px;
-      margin-bottom: 20px;
-    }
-
-    /* ── CONTACT ── */
-    #contact {
-      display: grid;
-      grid-template-columns: 1fr 2fr;
-    }
-
-    .contact-content { padding: 64px 64px 64px 48px; }
-
-    .contact-links { display: flex; flex-direction: column; gap: 16px; margin-top: 32px; }
-
-    .contact-link {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      padding: 16px 0;
-      border-bottom: 1px solid var(--line);
-      text-decoration: none;
-      color: var(--ink);
-      transition: color 0.2s;
-      group: true;
-    }
-
-    .contact-link:hover { color: var(--accent); }
-
-    .link-platform {
-      font-family: 'DM Mono', monospace;
-      font-size: 11px;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--muted);
-      min-width: 90px;
-    }
-
-    .link-handle {
-      font-size: 15px;
-      font-weight: 400;
-    }
-
-    .link-arrow { margin-left: auto; font-size: 18px; transition: transform 0.2s; }
-    .contact-link:hover .link-arrow { transform: translateX(4px); }
-
-    /* ── FOOTER ── */
-    footer {
-      padding: 24px 48px;
-      border-top: 1px solid var(--line);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .footer-name {
-      font-family: 'DM Mono', monospace;
-      font-size: 11px;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--muted);
-    }
-
-    .footer-location {
-      font-family: 'DM Mono', monospace;
-      font-size: 11px;
-      letter-spacing: 0.08em;
-      color: var(--muted);
-    }
-
-    /* ── ANIMATIONS ── */
-    @keyframes fadeDown {
-      from { opacity: 0; transform: translateY(-12px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(20px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-
-    @keyframes slideIn {
-      from { opacity: 0; transform: translateX(-20px); }
-      to   { opacity: 1; transform: translateX(0); }
-    }
-
-    /* ── SCROLL ANIMATIONS ── */
-    .reveal {
-      opacity: 0;
-      transform: translateY(24px);
-      transition: opacity 0.7s ease, transform 0.7s ease;
-    }
-    .reveal.visible {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    /* ── RESPONSIVE ── */
-    @media (max-width: 768px) {
-      header { padding: 20px 24px; }
-      nav { display: none; }
-      .hero { grid-template-columns: 1fr; min-height: auto; }
-      .hero-left { padding: 48px 24px; }
-      .hero-right { display: none; }
-      h1 { font-size: 64px; }
-      #about, #contact { grid-template-columns: 1fr; }
-      .section-num { display: none; }
-      .section-content, .contact-content { padding: 48px 24px; }
-      .project-grid { grid-template-columns: 1fr; }
-      .project-card { border-right: none; }
-      .projects-header { grid-template-columns: 1fr; }
-      footer { padding: 20px 24px; flex-direction: column; gap: 8px; text-align: center; }
-    }
-  </style>
-</head>
-<body>
-
-  <header>
-    <a href="#" class="logo">Brady White</a>
-    <nav>
-      <a href="#about">About</a>
-      <a href="#projects">Projects</a>
-      <a href="#contact">Contact</a>
-    </nav>
-  </header>
-
-  <!-- HERO -->
-  <section class="hero">
-    <div class="hero-left">
-      <p class="eyebrow">CBB Analytics &amp; AI</p>
-      <h1>WHERE <span>DATA</span> MEETS THE GAME</h1>
-      <p class="hero-desc">
-        CS and AI student at <strong>Eastern Kentucky University</strong> building tools that help college basketball coaches see the game differently — faster scouting, sharper strategy, better decisions.
-      </p>
-      <div class="cta-row">
-        <a href="#projects" class="btn-primary">See the work →</a>
-        <a href="#contact" class="btn-secondary">Get in touch</a>
-      </div>
-    </div>
-
-    <div class="hero-right">
-      <!-- Basketball court outline SVG -->
-      <svg class="court-svg" viewBox="0 0 400 340" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect x="2" y="2" width="396" height="336" stroke="#0e0e0e" stroke-width="3"/>
-        <line x1="200" y1="2" x2="200" y2="338" stroke="#0e0e0e" stroke-width="2"/>
-        <circle cx="200" cy="170" r="50" stroke="#0e0e0e" stroke-width="2"/>
-        <circle cx="200" cy="170" r="6" fill="#0e0e0e"/>
-        <rect x="2" y="85" width="120" height="170" stroke="#0e0e0e" stroke-width="2"/>
-        <rect x="278" y="85" width="120" height="170" stroke="#0e0e0e" stroke-width="2"/>
-        <path d="M2 110 Q62 170 2 230" stroke="#0e0e0e" stroke-width="2" fill="none"/>
-        <path d="M398 110 Q338 170 398 230" stroke="#0e0e0e" stroke-width="2" fill="none"/>
-        <circle cx="62" cy="170" r="30" stroke="#0e0e0e" stroke-width="2"/>
-        <circle cx="338" cy="170" r="30" stroke="#0e0e0e" stroke-width="2"/>
-        <line x1="2" y1="170" x2="42" y2="170" stroke="#0e0e0e" stroke-width="2"/>
-        <line x1="358" y1="170" x2="398" y2="170" stroke="#0e0e0e" stroke-width="2"/>
-      </svg>
-
-      <div class="stat-cards">
-        <div class="stat-card">
-          <div class="stat-num">300+</div>
-          <div class="stat-label">Mid-Major Programs</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-num">AI</div>
-          <div class="stat-label">Powered Analysis</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-num">EKU</div>
-          <div class="stat-label">Eastern Kentucky</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ABOUT -->
-  <section id="about" class="reveal">
-    <div class="section-num">
-      <span>01 / ABOUT</span>
-    </div>
-    <div class="section-content">
-      <h2 class="section-title">The Intersection</h2>
-      <p class="section-body">
-        I'm Brady — a <strong>Computer Science and AI student at Eastern Kentucky University</strong> with a deep obsession for college basketball strategy and analytics. I sit at a rare intersection: technical enough to build the tools, knowledgeable enough to know what actually matters on the court.
-        <br><br>
-        My focus is building AI-powered tools for <strong>college basketball coaches</strong> — specifically helping mid-major programs access the kind of analytics infrastructure that used to be reserved for Power 4 programs with full analytics staffs.
-        <br><br>
-        Building in public. Learning out loud. Rooted in Richmond, Kentucky.
-      </p>
-      <div class="tags">
-        <span class="tag">Game Strategy</span>
-        <span class="tag">Scouting Reports</span>
-        <span class="tag">Python</span>
-        <span class="tag">Machine Learning</span>
-        <span class="tag">Data Visualization</span>
-        <span class="tag">Mid-Major CBB</span>
-      </div>
-    </div>
-  </section>
-
-  <!-- PROJECTS -->
-  <section id="projects" class="reveal">
-    <div class="projects-header">
-      <div class="section-num">
-        <span>02 / PROJECTS</span>
-      </div>
-      <div class="section-content" style="padding-top:40px;padding-bottom:40px;">
-        <h2 class="section-title">The Work</h2>
-        <p class="section-body">Tools built at the intersection of AI and college basketball. All work is public on GitHub.</p>
-      </div>
-    </div>
-
-    <div class="project-grid">
-      <div class="project-card">
-        <div class="wip-badge">In Progress</div>
-        <p class="project-num">P.01</p>
-        <h3 class="project-title">Opponent Tendency Analyzer</h3>
-        <p class="project-desc">Ingests public play-by-play data to surface opponent tendencies — late-shot-clock habits, ball screen coverage, out-of-timeout sets. Formats output as a coach-ready report.</p>
-        <div class="project-tech">
-          <span class="tech-pill">Python</span>
-          <span class="tech-pill">Bart Torvik API</span>
-          <span class="tech-pill">GPT-4</span>
-        </div>
-      </div>
-
-      <div class="project-card">
-        <div class="wip-badge">In Progress</div>
-        <p class="project-num">P.02</p>
-        <h3 class="project-title">Transfer Portal Fit Score</h3>
-        <p class="project-desc">Screens portal entries against a program's system requirements — pace, shot selection, defensive profile — and ranks incoming players by projected fit.</p>
-        <div class="project-tech">
-          <span class="tech-pill">Python</span>
-          <span class="tech-pill">KenPom Data</span>
-          <span class="tech-pill">ML Modeling</span>
-        </div>
-      </div>
-
-      <div class="project-card">
-        <p class="project-num">P.03</p>
-        <h3 class="project-title">Lineup Efficiency Dashboard</h3>
-        <p class="project-desc">Visualizes five-man unit performance across key metrics — net rating, eFG%, pace differential — to help coaches identify optimal rotation patterns.</p>
-        <div class="project-tech">
-          <span class="tech-pill">Python</span>
-          <span class="tech-pill">Matplotlib</span>
-          <span class="tech-pill">NCAA Data</span>
-        </div>
-      </div>
-
-      <div class="project-card">
-        <p class="project-num">P.04</p>
-        <h3 class="project-title">More Coming</h3>
-        <p class="project-desc">Building in public — follow along on X/Twitter for progress updates, data posts, and early access to new tools as they're built.</p>
-        <div class="project-tech">
-          <span class="tech-pill">Follow @BradyWhiteCBB</span>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- CONTACT -->
-  <section id="contact" class="reveal">
-    <div class="section-num">
-      <span>03 / CONTACT</span>
-    </div>
-    <div class="contact-content">
-      <h2 class="section-title">Let's Talk</h2>
-      <p class="section-body">
-        Interested in the tools, want to collaborate, or just want to talk college basketball analytics? I'm always open to conversations with coaches, analysts, and fellow builders.
-      </p>
-      <div class="contact-links">
-        <a href="https://twitter.com/BradyWhiteCBB" target="_blank" class="contact-link">
-          <span class="link-platform">X / Twitter</span>
-          <span class="link-handle">@BradyWhiteCBB</span>
-          <span class="link-arrow">→</span>
-        </a>
-        <a href="https://linkedin.com/in/bradywhite" target="_blank" class="contact-link">
-          <span class="link-platform">LinkedIn</span>
-          <span class="link-handle">Brady White</span>
-          <span class="link-arrow">→</span>
-        </a>
-        <a href="https://github.com/bradywhite" target="_blank" class="contact-link">
-          <span class="link-platform">GitHub</span>
-          <span class="link-handle">bradywhite</span>
-          <span class="link-arrow">→</span>
-        </a>
-        <a href="mailto:hello@bradywhite.dev" class="contact-link">
-          <span class="link-platform">Email</span>
-          <span class="link-handle">hello@bradywhite.dev</span>
-          <span class="link-arrow">→</span>
-        </a>
-      </div>
-    </div>
-  </section>
-
-  <footer>
-    <span class="footer-name">Brady White — bradywhite.dev</span>
-    <span class="footer-location">Richmond, Kentucky · Eastern Kentucky University</span>
-  </footer>
-
-  <script>
-    const reveals = document.querySelectorAll('.reveal');
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('visible');
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Brady White — CBB Analytics</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=DM+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      :root {
+        --ink: #0e0e0e;
+        --paper: #f4f1eb;
+        --accent: #c8410a;
+        --muted: #7a7468;
+        --line: #d4cfc6;
+        --court: #e8e0d0;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        font-family: "DM Sans", sans-serif;
+        background: var(--paper);
+        color: var(--ink);
+        overflow-x: hidden;
+      }
+
+      /* ── NOISE TEXTURE OVERLAY ── */
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+        pointer-events: none;
+        z-index: 1000;
+        opacity: 0.5;
+      }
+
+      /* ── HEADER ── */
+      header {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        align-items: center;
+        padding: 28px 48px;
+        border-bottom: 1px solid var(--line);
+        animation: fadeDown 0.6s ease both;
+      }
+
+      .logo {
+        font-family: "Bebas Neue", sans-serif;
+        font-size: 22px;
+        letter-spacing: 0.06em;
+        color: var(--ink);
+        text-decoration: none;
+      }
+
+      nav {
+        display: flex;
+        gap: 32px;
+        align-items: center;
+      }
+      nav a {
+        font-size: 13px;
+        font-weight: 500;
+        letter-spacing: 0.04em;
+        color: var(--muted);
+        text-decoration: none;
+        transition: color 0.2s;
+      }
+      nav a:hover {
+        color: var(--ink);
+      }
+
+      nav a.nav-highlight {
+        color: var(--paper);
+        background: var(--accent);
+        padding: 7px 14px;
+        font-size: 12px;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        transition: background 0.2s;
+      }
+      nav a.nav-highlight:hover {
+        background: var(--ink);
+        color: var(--paper);
+      }
+
+      /* ── HERO ── */
+      .hero {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        min-height: calc(100vh - 81px);
+        border-bottom: 1px solid var(--line);
+      }
+
+      .hero-left {
+        padding: 80px 48px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        border-right: 1px solid var(--line);
+        animation: fadeUp 0.8s 0.1s ease both;
+      }
+
+      .eyebrow {
+        font-family: "DM Mono", monospace;
+        font-size: 11px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--accent);
+        margin-bottom: 24px;
+      }
+
+      h1 {
+        font-family: "Bebas Neue", sans-serif;
+        font-size: clamp(72px, 9vw, 120px);
+        line-height: 0.92;
+        letter-spacing: 0.01em;
+        color: var(--ink);
+        margin-bottom: 32px;
+      }
+
+      h1 span {
+        color: var(--accent);
+      }
+
+      .hero-desc {
+        font-size: 17px;
+        font-weight: 300;
+        line-height: 1.7;
+        color: var(--muted);
+        max-width: 440px;
+        margin-bottom: 48px;
+      }
+
+      .hero-desc strong {
+        color: var(--ink);
+        font-weight: 500;
+      }
+
+      .cta-row {
+        display: flex;
+        gap: 14px;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+
+      .btn-primary {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: var(--ink);
+        color: var(--paper);
+        padding: 14px 28px;
+        font-size: 13px;
+        font-weight: 500;
+        letter-spacing: 0.04em;
+        text-decoration: none;
+        transition:
+          background 0.2s,
+          transform 0.15s;
+      }
+      .btn-primary:hover {
+        background: var(--accent);
+        transform: translateY(-1px);
+      }
+
+      .btn-accent {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: var(--accent);
+        color: var(--paper);
+        padding: 14px 28px;
+        font-size: 13px;
+        font-weight: 500;
+        letter-spacing: 0.04em;
+        text-decoration: none;
+        transition:
+          background 0.2s,
+          transform 0.15s;
+      }
+      .btn-accent:hover {
+        background: var(--ink);
+        transform: translateY(-1px);
+      }
+
+      .btn-secondary {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--muted);
+        font-size: 13px;
+        font-weight: 500;
+        letter-spacing: 0.04em;
+        text-decoration: none;
+        border-bottom: 1px solid var(--line);
+        padding-bottom: 2px;
+        transition:
+          color 0.2s,
+          border-color 0.2s;
+      }
+      .btn-secondary:hover {
+        color: var(--ink);
+        border-color: var(--ink);
+      }
+
+      /* ── HERO RIGHT ── */
+      .hero-right {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 48px;
+        background: var(--court);
+        position: relative;
+        overflow: hidden;
+        animation: fadeUp 0.8s 0.25s ease both;
+      }
+
+      .court-svg {
+        width: 100%;
+        max-width: 360px;
+        opacity: 0.18;
+      }
+
+      .stat-cards {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: flex-start;
+        padding: 48px;
+        gap: 16px;
+      }
+
+      .stat-card {
+        background: var(--paper);
+        border: 1px solid var(--line);
+        padding: 16px 20px;
+        min-width: 200px;
+        animation: slideIn 0.6s ease both;
+      }
+
+      .stat-card:nth-child(1) {
+        animation-delay: 0.4s;
+        margin-left: 0;
+      }
+      .stat-card:nth-child(2) {
+        animation-delay: 0.55s;
+        margin-left: 32px;
+      }
+      .stat-card:nth-child(3) {
+        animation-delay: 0.7s;
+        margin-left: 16px;
+      }
+
+      .stat-num {
+        font-family: "Bebas Neue", sans-serif;
+        font-size: 36px;
+        color: var(--accent);
+        line-height: 1;
+        margin-bottom: 4px;
+      }
+
+      .stat-label {
+        font-size: 11px;
+        font-weight: 500;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+
+      /* ── STATS LAB BANNER ── */
+      .stats-banner {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        align-items: center;
+        gap: 32px;
+        padding: 36px 48px;
+        background: var(--ink);
+        color: var(--paper);
+        border-bottom: 1px solid var(--line);
+        animation: fadeUp 0.8s 0.3s ease both;
+      }
+
+      .stats-banner-left {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .stats-banner-eyebrow {
+        font-family: "DM Mono", monospace;
+        font-size: 10px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--accent);
+      }
+
+      .stats-banner-title {
+        font-family: "Bebas Neue", sans-serif;
+        font-size: 28px;
+        letter-spacing: 0.04em;
+        line-height: 1;
+      }
+
+      .stats-banner-desc {
+        font-size: 13px;
+        font-weight: 300;
+        color: #a09a94;
+        max-width: 560px;
+        line-height: 1.6;
+      }
+
+      .btn-banner {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: var(--accent);
+        color: var(--paper);
+        padding: 14px 28px;
+        font-size: 13px;
+        font-weight: 500;
+        letter-spacing: 0.04em;
+        text-decoration: none;
+        white-space: nowrap;
+        transition:
+          background 0.2s,
+          transform 0.15s;
+        flex-shrink: 0;
+      }
+      .btn-banner:hover {
+        background: #a83408;
+        transform: translateY(-1px);
+      }
+
+      /* ── ABOUT ── */
+      #about {
+        display: grid;
+        grid-template-columns: 1fr 2fr;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .section-num {
+        padding: 64px 48px;
+        border-right: 1px solid var(--line);
+        display: flex;
+        align-items: flex-start;
+      }
+
+      .section-num span {
+        font-family: "DM Mono", monospace;
+        font-size: 12px;
+        color: var(--muted);
+        letter-spacing: 0.1em;
+      }
+
+      .section-content {
+        padding: 64px 64px 64px 48px;
+      }
+
+      .section-title {
+        font-family: "Bebas Neue", sans-serif;
+        font-size: 48px;
+        letter-spacing: 0.02em;
+        color: var(--ink);
+        margin-bottom: 28px;
+        line-height: 1;
+      }
+
+      .section-body {
+        font-size: 16px;
+        font-weight: 300;
+        line-height: 1.8;
+        color: var(--muted);
+        max-width: 560px;
+      }
+
+      .section-body strong {
+        color: var(--ink);
+        font-weight: 500;
+      }
+
+      .tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 32px;
+      }
+
+      .tag {
+        font-family: "DM Mono", monospace;
+        font-size: 11px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--ink);
+        border: 1px solid var(--line);
+        padding: 6px 12px;
+      }
+
+      /* ── PROJECTS ── */
+      #projects {
+        border-bottom: 1px solid var(--line);
+      }
+
+      .projects-header {
+        display: grid;
+        grid-template-columns: 1fr 2fr;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .project-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .project-card {
+        padding: 48px;
+        border-right: 1px solid var(--line);
+        border-bottom: 1px solid var(--line);
+        transition: background 0.2s;
+        cursor: default;
+      }
+
+      .project-card:nth-child(even) {
+        border-right: none;
+      }
+      .project-card:hover {
+        background: var(--court);
+      }
+
+      .project-card.featured {
+        background: var(--court);
+        border-left: 3px solid var(--accent);
+        cursor: pointer;
+        text-decoration: none;
+        color: inherit;
+        display: block;
+      }
+      .project-card.featured:hover {
+        background: #dfd7c5;
+      }
+
+      .project-num {
+        font-family: "DM Mono", monospace;
+        font-size: 11px;
+        color: var(--accent);
+        letter-spacing: 0.1em;
+        margin-bottom: 20px;
+      }
+
+      .project-title {
+        font-family: "Bebas Neue", sans-serif;
+        font-size: 28px;
+        letter-spacing: 0.02em;
+        color: var(--ink);
+        margin-bottom: 12px;
+        line-height: 1.1;
+      }
+
+      .project-desc {
+        font-size: 14px;
+        font-weight: 300;
+        line-height: 1.7;
+        color: var(--muted);
+        margin-bottom: 20px;
+      }
+
+      .project-tech {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+
+      .tech-pill {
+        font-family: "DM Mono", monospace;
+        font-size: 10px;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--muted);
+        background: var(--line);
+        padding: 4px 8px;
+      }
+
+      .live-pill {
+        font-family: "DM Mono", monospace;
+        font-size: 10px;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--paper);
+        background: var(--accent);
+        padding: 4px 10px;
+      }
+
+      .wip-badge {
+        display: inline-block;
+        font-family: "DM Mono", monospace;
+        font-size: 10px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--paper);
+        background: var(--accent);
+        padding: 4px 10px;
+        margin-bottom: 20px;
+      }
+
+      .live-badge {
+        display: inline-block;
+        font-family: "DM Mono", monospace;
+        font-size: 10px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--paper);
+        background: #1a7a4a;
+        padding: 4px 10px;
+        margin-bottom: 20px;
+      }
+
+      .project-link-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 16px;
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--accent);
+        letter-spacing: 0.04em;
+      }
+
+      /* ── CONTACT ── */
+      #contact {
+        display: grid;
+        grid-template-columns: 1fr 2fr;
+      }
+
+      .contact-content {
+        padding: 64px 64px 64px 48px;
+      }
+
+      .contact-links {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        margin-top: 32px;
+      }
+
+      .contact-link {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 16px 0;
+        border-bottom: 1px solid var(--line);
+        text-decoration: none;
+        color: var(--ink);
+        transition: color 0.2s;
+      }
+
+      .contact-link:hover {
+        color: var(--accent);
+      }
+
+      .link-platform {
+        font-family: "DM Mono", monospace;
+        font-size: 11px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--muted);
+        min-width: 90px;
+      }
+
+      .link-handle {
+        font-size: 15px;
+        font-weight: 400;
+      }
+
+      .link-arrow {
+        margin-left: auto;
+        font-size: 18px;
+        transition: transform 0.2s;
+      }
+      .contact-link:hover .link-arrow {
+        transform: translateX(4px);
+      }
+
+      /* ── FOOTER ── */
+      footer {
+        padding: 24px 48px;
+        border-top: 1px solid var(--line);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .footer-name {
+        font-family: "DM Mono", monospace;
+        font-size: 11px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+
+      .footer-location {
+        font-family: "DM Mono", monospace;
+        font-size: 11px;
+        letter-spacing: 0.08em;
+        color: var(--muted);
+      }
+
+      /* ── ANIMATIONS ── */
+      @keyframes fadeDown {
+        from {
+          opacity: 0;
+          transform: translateY(-12px);
         }
-      });
-    }, { threshold: 0.1 });
-    reveals.forEach(el => observer.observe(el));
-  </script>
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
 
-</body>
+      @keyframes fadeUp {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes slideIn {
+        from {
+          opacity: 0;
+          transform: translateX(-20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+
+      .reveal {
+        opacity: 0;
+        transform: translateY(24px);
+        transition:
+          opacity 0.7s ease,
+          transform 0.7s ease;
+      }
+      .reveal.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      /* ── RESPONSIVE ── */
+      @media (max-width: 768px) {
+        header {
+          padding: 20px 24px;
+        }
+        nav {
+          gap: 16px;
+        }
+        nav a.nav-highlight {
+          padding: 6px 10px;
+        }
+        .hero {
+          grid-template-columns: 1fr;
+          min-height: auto;
+        }
+        .hero-left {
+          padding: 48px 24px;
+        }
+        .hero-right {
+          display: none;
+        }
+        h1 {
+          font-size: 64px;
+        }
+        .stats-banner {
+          grid-template-columns: 1fr;
+          padding: 28px 24px;
+          gap: 20px;
+        }
+        #about,
+        #contact {
+          grid-template-columns: 1fr;
+        }
+        .section-num {
+          display: none;
+        }
+        .section-content,
+        .contact-content {
+          padding: 48px 24px;
+        }
+        .project-grid {
+          grid-template-columns: 1fr;
+        }
+        .project-card {
+          border-right: none;
+        }
+        .projects-header {
+          grid-template-columns: 1fr;
+        }
+        footer {
+          padding: 20px 24px;
+          flex-direction: column;
+          gap: 8px;
+          text-align: center;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <a href="#" class="logo">Brady White</a>
+      <nav>
+        <a href="#about">About</a>
+        <a href="#projects">Projects</a>
+        <a href="#contact">Contact</a>
+        <a href="/stats.html" class="nav-highlight">Stats Lab →</a>
+      </nav>
+    </header>
+
+    <!-- HERO -->
+    <section class="hero">
+      <div class="hero-left">
+        <p class="eyebrow">CBB Analytics &amp; AI</p>
+        <h1>WHERE <span>DATA</span> MEETS THE GAME</h1>
+        <p class="hero-desc">
+          CS and Statistics student at
+          <strong>Eastern Kentucky University</strong> building tools that help
+          college basketball coaches see the game differently — faster scouting,
+          sharper strategy, better decisions.
+        </p>
+        <div class="cta-row">
+          <a href="/stats.html" class="btn-accent">Try Stats Lab →</a>
+          <a href="#projects" class="btn-primary">See the work</a>
+          <a href="#contact" class="btn-secondary">Get in touch</a>
+        </div>
+      </div>
+
+      <div class="hero-right">
+        <svg
+          class="court-svg"
+          viewBox="0 0 400 340"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <rect
+            x="2"
+            y="2"
+            width="396"
+            height="336"
+            stroke="#0e0e0e"
+            stroke-width="3"
+          />
+          <line
+            x1="200"
+            y1="2"
+            x2="200"
+            y2="338"
+            stroke="#0e0e0e"
+            stroke-width="2"
+          />
+          <circle cx="200" cy="170" r="50" stroke="#0e0e0e" stroke-width="2" />
+          <circle cx="200" cy="170" r="6" fill="#0e0e0e" />
+          <rect
+            x="2"
+            y="85"
+            width="120"
+            height="170"
+            stroke="#0e0e0e"
+            stroke-width="2"
+          />
+          <rect
+            x="278"
+            y="85"
+            width="120"
+            height="170"
+            stroke="#0e0e0e"
+            stroke-width="2"
+          />
+          <path
+            d="M2 110 Q62 170 2 230"
+            stroke="#0e0e0e"
+            stroke-width="2"
+            fill="none"
+          />
+          <path
+            d="M398 110 Q338 170 398 230"
+            stroke="#0e0e0e"
+            stroke-width="2"
+            fill="none"
+          />
+          <circle cx="62" cy="170" r="30" stroke="#0e0e0e" stroke-width="2" />
+          <circle cx="338" cy="170" r="30" stroke="#0e0e0e" stroke-width="2" />
+          <line
+            x1="2"
+            y1="170"
+            x2="42"
+            y2="170"
+            stroke="#0e0e0e"
+            stroke-width="2"
+          />
+          <line
+            x1="358"
+            y1="170"
+            x2="398"
+            y2="170"
+            stroke="#0e0e0e"
+            stroke-width="2"
+          />
+        </svg>
+
+        <div class="stat-cards">
+          <div class="stat-card">
+            <div class="stat-num">300+</div>
+            <div class="stat-label">D1 Programs Tracked</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-num">WPI</div>
+            <div class="stat-label">Weighted Performance Index</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-num">LIVE</div>
+            <div class="stat-label">ESPN Data · Stats Lab</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- STATS LAB BANNER -->
+    <div class="stats-banner reveal">
+      <div class="stats-banner-left">
+        <div class="stats-banner-eyebrow">Now Live — Baseline Logic</div>
+        <div class="stats-banner-title">
+          Stats Lab · Live College Basketball Analytics
+        </div>
+        <div class="stats-banner-desc">
+          Browse live team stats, efficiency ratings, and WPI rankings for every
+          D1 program — or upload your own CSV and get instant analysis.
+        </div>
+      </div>
+      <a href="/stats.html" class="btn-banner">Open Stats Lab →</a>
+    </div>
+
+    <!-- ABOUT -->
+    <section id="about" class="reveal">
+      <div class="section-num">
+        <span>01 / ABOUT</span>
+      </div>
+      <div class="section-content">
+        <h2 class="section-title">The Intersection</h2>
+        <p class="section-body">
+          I'm Brady — a
+          <strong
+            >Computer Science and Statistics student at Eastern Kentucky
+            University</strong
+          >
+          with a deep obsession for college basketball strategy and analytics. I
+          sit at a rare intersection: technical enough to build the tools,
+          knowledgeable enough to know what actually matters on the court.
+          <br /><br />
+          My focus is building analytics tools for
+          <strong>college basketball</strong> — specifically surfacing the kind
+          of data-driven insight that used to require a full analytics staff.
+          The WPI model, Stats Lab, and Baseline Logic are all part of that
+          mission. <br /><br />
+          Building in public. Learning out loud. Rooted in Richmond, Kentucky.
+        </p>
+        <div class="tags">
+          <span class="tag">Game Strategy</span>
+          <span class="tag">Scouting Reports</span>
+          <span class="tag">Python</span>
+          <span class="tag">React / Vite</span>
+          <span class="tag">Data Visualization</span>
+          <span class="tag">Mid-Major CBB</span>
+          <span class="tag">WPI Model</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- PROJECTS -->
+    <section id="projects" class="reveal">
+      <div class="projects-header">
+        <div class="section-num">
+          <span>02 / PROJECTS</span>
+        </div>
+        <div
+          class="section-content"
+          style="padding-top: 40px; padding-bottom: 40px"
+        >
+          <h2 class="section-title">The Work</h2>
+          <p class="section-body">
+            Tools built at the intersection of data and college basketball. All
+            work is public on GitHub.
+          </p>
+        </div>
+      </div>
+
+      <div class="project-grid">
+        <a href="/stats.html" class="project-card featured">
+          <div class="live-badge">Live</div>
+          <p class="project-num">P.01</p>
+          <h3 class="project-title">Stats Lab</h3>
+          <p class="project-desc">
+            Live D1 team stats, efficiency ratings, and WPI rankings pulled
+            directly from ESPN. Upload your own CSV for instant player or team
+            analysis. Built for coaches and analysts.
+          </p>
+          <div class="project-tech">
+            <span class="tech-pill">HTML / JS</span>
+            <span class="tech-pill">ESPN API</span>
+            <span class="tech-pill">WPI Model</span>
+            <span class="live-pill">Try it →</span>
+          </div>
+        </a>
+
+        <div class="project-card">
+          <div class="wip-badge">In Progress</div>
+          <p class="project-num">P.02</p>
+          <h3 class="project-title">Transfer Portal Fit Score</h3>
+          <p class="project-desc">
+            Screens portal entries against a program's system requirements —
+            pace, shot selection, defensive profile — and ranks incoming players
+            by projected fit.
+          </p>
+          <div class="project-tech">
+            <span class="tech-pill">Python</span>
+            <span class="tech-pill">KenPom Data</span>
+            <span class="tech-pill">ML Modeling</span>
+          </div>
+        </div>
+
+        <div class="project-card">
+          <div class="wip-badge">In Progress</div>
+          <p class="project-num">P.03</p>
+          <h3 class="project-title">Opponent Tendency Analyzer</h3>
+          <p class="project-desc">
+            Ingests public play-by-play data to surface opponent tendencies —
+            late-shot-clock habits, ball screen coverage, out-of-timeout sets.
+            Formats output as a coach-ready report.
+          </p>
+          <div class="project-tech">
+            <span class="tech-pill">Python</span>
+            <span class="tech-pill">Bart Torvik API</span>
+            <span class="tech-pill">GPT-4</span>
+          </div>
+        </div>
+
+        <div class="project-card">
+          <p class="project-num">P.04</p>
+          <h3 class="project-title">More Coming</h3>
+          <p class="project-desc">
+            Building in public — follow along on X/Twitter for progress updates,
+            data posts, and early access to new tools as they ship.
+          </p>
+          <div class="project-tech">
+            <span class="tech-pill">@brady15white</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONTACT -->
+    <section id="contact" class="reveal">
+      <div class="section-num">
+        <span>03 / CONTACT</span>
+      </div>
+      <div class="contact-content">
+        <h2 class="section-title">Let's Talk</h2>
+        <p class="section-body">
+          Interested in the tools, want to collaborate, or just want to talk
+          college basketball analytics? Open to conversations with coaches,
+          analysts, recruiters, and fellow builders.
+        </p>
+        <div class="contact-links">
+          <a
+            href="https://twitter.com/brady15white"
+            target="_blank"
+            class="contact-link"
+          >
+            <span class="link-platform">X / Twitter</span>
+            <span class="link-handle">@brady15white</span>
+            <span class="link-arrow">→</span>
+          </a>
+          <a
+            href="https://linkedin.com/in/bradywhite"
+            target="_blank"
+            class="contact-link"
+          >
+            <span class="link-platform">LinkedIn</span>
+            <span class="link-handle">Brady White</span>
+            <span class="link-arrow">→</span>
+          </a>
+          <a
+            href="https://github.com/bradyWhite14"
+            target="_blank"
+            class="contact-link"
+          >
+            <span class="link-platform">GitHub</span>
+            <span class="link-handle">bradyWhite14</span>
+            <span class="link-arrow">→</span>
+          </a>
+          <a href="mailto:hello@bradywhite.dev" class="contact-link">
+            <span class="link-platform">Email</span>
+            <span class="link-handle">hello@bradywhite.dev</span>
+            <span class="link-arrow">→</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <span class="footer-name">Brady White — bradywhite.dev</span>
+      <span class="footer-location"
+        >Richmond, Kentucky · Eastern Kentucky University</span
+      >
+    </footer>
+
+    <script>
+      const reveals = document.querySelectorAll(".reveal");
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) entry.target.classList.add("visible");
+          });
+        },
+        { threshold: 0.1 },
+      );
+      reveals.forEach((el) => observer.observe(el));
+    </script>
+  </body>
 </html>
