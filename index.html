@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BRADY WHITE // SYSTEM</title>
+<meta name="description" content="CS Student. Builder. EKU.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#020507;
+  --panel:#040c11;
+  --panel2:#071520;
+  --cyan:#00d4ff;
+  --cyan2:#00ffcc;
+  --cyan-dim:rgba(0,212,255,0.12);
+  --cyan-glow:rgba(0,212,255,0.35);
+  --red:#ff3b3b;
+  --amber:#ffaa00;
+  --text:#c8e8f0;
+  --muted:#3a6070;
+  --mono:'Share Tech Mono',monospace;
+  --sans:'Rajdhani',sans-serif;
+  --border:rgba(0,212,255,0.18);
+  --border-bright:rgba(0,212,255,0.5);
+}
+
+html{scroll-behavior:smooth;}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:var(--sans);
+  font-size:16px;
+  overflow-x:hidden;
+  cursor:crosshair;
+}
+
+/* ── SCANLINES ── */
+body::before{
+  content:'';
+  position:fixed;
+  inset:0;
+  background:repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0,0,0,0.15) 2px,
+    rgba(0,0,0,0.15) 4px
+  );
+  pointer-events:none;
+  z-index:9999;
+}
+
+/* ── GRID BG ── */
+body::after{
+  content:'';
+  position:fixed;
+  inset:0;
+  background-image:
+    linear-gradient(rgba(0,212,255,0.03) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(0,212,255,0.03) 1px,transparent 1px);
+  background-size:40px 40px;
+  pointer-events:none;
+  z-index:0;
+}
+
+/* ── CORNER BRACKET MIXIN ── */
+.bracket{
+  position:relative;
+}
+.bracket::before,.bracket::after{
+  content:'';
+  position:absolute;
+  width:12px;height:12px;
+}
+.bracket::before{
+  top:0;left:0;
+  border-top:1px solid var(--cyan);
+  border-left:1px solid var(--cyan);
+}
+.bracket::after{
+  bottom:0;right:0;
+  border-bottom:1px solid var(--cyan);
+  border-right:1px solid var(--cyan);
+}
+
+/* ── NAV ── */
+nav{
+  position:fixed;top:0;left:0;right:0;
+  z-index:1000;
+  display:flex;justify-content:space-between;align-items:center;
+  padding:0 2rem;
+  height:56px;
+  background:rgba(2,5,7,0.92);
+  border-bottom:1px solid var(--border);
+  backdrop-filter:blur(16px);
+}
+.nav-id{
+  display:flex;align-items:center;gap:1rem;
+  font-family:var(--mono);font-size:12px;color:var(--cyan);
+  letter-spacing:0.1em;
+}
+.nav-id .dot{
+  width:6px;height:6px;
+  background:var(--cyan);
+  border-radius:50%;
+  animation:pulse 2s infinite;
+}
+@keyframes pulse{
+  0%,100%{opacity:1;box-shadow:0 0 0 0 var(--cyan-glow);}
+  50%{opacity:0.6;box-shadow:0 0 0 5px transparent;}
+}
+.nav-links{
+  display:flex;gap:0.25rem;list-style:none;
+}
+.nav-links a{
+  font-family:var(--mono);font-size:11px;
+  color:var(--muted);text-decoration:none;
+  letter-spacing:0.12em;text-transform:uppercase;
+  padding:0.4rem 0.75rem;
+  border:1px solid transparent;
+  transition:all 0.2s;
+}
+.nav-links a:hover{
+  color:var(--cyan);border-color:var(--border);
+  background:var(--cyan-dim);
+}
+.nav-status{
+  font-family:var(--mono);font-size:11px;
+  color:var(--muted);letter-spacing:0.1em;
+  display:flex;align-items:center;gap:0.5rem;
+}
+.status-online{color:var(--cyan2);font-size:11px;}
+
+/* ── HERO ── */
+#hero{
+  min-height:100vh;
+  display:flex;flex-direction:column;justify-content:center;
+  padding:56px 3rem 3rem;
+  position:relative;z-index:1;
+  overflow:hidden;
+}
+.hero-scan{
+  position:absolute;top:0;left:0;right:0;
+  height:2px;
+  background:linear-gradient(90deg,transparent,var(--cyan),transparent);
+  animation:scan 4s ease-in-out infinite;
+  opacity:0.6;
+}
+@keyframes scan{
+  0%{top:0%;}
+  100%{top:100%;}
+}
+.hero-corner{
+  position:absolute;
+  width:80px;height:80px;
+}
+.hero-corner.tl{top:80px;left:3rem;border-top:1px solid var(--border-bright);border-left:1px solid var(--border-bright);}
+.hero-corner.tr{top:80px;right:3rem;border-top:1px solid var(--border-bright);border-right:1px solid var(--border-bright);}
+.hero-corner.bl{bottom:3rem;left:3rem;border-bottom:1px solid var(--border-bright);border-left:1px solid var(--border-bright);}
+.hero-corner.br{bottom:3rem;right:3rem;border-bottom:1px solid var(--border-bright);border-right:1px solid var(--border-bright);}
+
+.hero-eyebrow{
+  font-family:var(--mono);font-size:11px;
+  color:var(--muted);letter-spacing:0.2em;
+  text-transform:uppercase;margin-bottom:2rem;
+  display:flex;align-items:center;gap:1rem;
+  opacity:0;animation:fadeUp 0.5s ease 0.2s forwards;
+}
+.hero-eyebrow span{color:var(--cyan);}
+
+.hero-name{
+  font-family:var(--sans);font-size:clamp(4rem,12vw,10rem);
+  font-weight:700;line-height:0.9;
+  letter-spacing:-0.02em;
+  opacity:0;animation:fadeUp 0.6s ease 0.4s forwards;
+  margin-bottom:1.5rem;
+}
+.hero-name .line2{
+  color:transparent;
+  -webkit-text-stroke:1px var(--cyan);
+  text-stroke:1px var(--cyan);
+}
+
+.hero-meta{
+  display:flex;gap:4rem;align-items:flex-start;flex-wrap:wrap;
+  opacity:0;animation:fadeUp 0.6s ease 0.6s forwards;
+  margin-bottom:3rem;
+}
+.hero-desc{
+  max-width:380px;
+  color:var(--muted);font-size:14px;line-height:1.8;
+  font-family:var(--mono);
+  border-left:1px solid var(--border);
+  padding-left:1.5rem;
+}
+.hero-desc strong{color:var(--text);}
+
+.hero-stats{
+  display:flex;flex-direction:column;gap:0.75rem;
+}
+.hstat{
+  display:flex;align-items:center;gap:1rem;
+  font-family:var(--mono);font-size:11px;
+}
+.hstat-label{color:var(--muted);letter-spacing:0.1em;width:80px;}
+.hstat-bar{
+  width:120px;height:2px;
+  background:rgba(0,212,255,0.1);
+  position:relative;overflow:hidden;
+}
+.hstat-fill{
+  position:absolute;left:0;top:0;height:100%;
+  background:var(--cyan);
+  animation:barFill 1.5s ease 0.8s both;
+}
+@keyframes barFill{from{width:0;}to{width:var(--w);}}
+.hstat-val{color:var(--cyan);font-size:11px;letter-spacing:0.05em;}
+
+.hero-actions{
+  display:flex;gap:1rem;flex-wrap:wrap;
+  opacity:0;animation:fadeUp 0.5s ease 0.8s forwards;
+}
+
+@keyframes fadeUp{
+  from{opacity:0;transform:translateY(20px);}
+  to{opacity:1;transform:translateY(0);}
+}
+
+/* ── BUTTONS ── */
+.btn{
+  display:inline-flex;align-items:center;gap:0.6rem;
+  padding:0.65rem 1.5rem;
+  font-family:var(--mono);font-size:11px;
+  letter-spacing:0.15em;text-transform:uppercase;
+  text-decoration:none;border:1px solid var(--border);
+  color:var(--muted);background:transparent;
+  cursor:crosshair;transition:all 0.2s;
+  position:relative;overflow:hidden;
+}
+.btn::before{
+  content:'';position:absolute;inset:0;
+  background:var(--cyan-dim);
+  transform:translateX(-100%);transition:transform 0.2s;
+}
+.btn:hover::before{transform:translateX(0);}
+.btn:hover{color:var(--cyan);border-color:var(--cyan);}
+
+.btn-primary{
+  border-color:var(--cyan);color:var(--cyan);
+  background:var(--cyan-dim);
+  box-shadow:0 0 20px rgba(0,212,255,0.15);
+}
+.btn-primary:hover{box-shadow:0 0 30px rgba(0,212,255,0.3);}
+.btn-primary::before{display:none;}
+
+/* ── SECTION LAYOUT ── */
+.section{
+  position:relative;z-index:1;
+  border-top:1px solid var(--border);
+}
+.section-inner{
+  max-width:1200px;margin:0 auto;
+  padding:5rem 3rem;
+}
+.section-header{
+  display:flex;align-items:flex-start;gap:2rem;
+  margin-bottom:4rem;flex-wrap:wrap;
+}
+.section-id{
+  font-family:var(--mono);font-size:10px;
+  color:var(--cyan);letter-spacing:0.2em;
+  text-transform:uppercase;
+  display:flex;flex-direction:column;gap:0.25rem;
+  padding-top:0.25rem;
+}
+.section-id .num{font-size:20px;font-weight:700;line-height:1;opacity:0.3;}
+.section-title{
+  font-size:clamp(2rem,5vw,3.5rem);
+  font-weight:700;letter-spacing:-0.02em;
+  line-height:1;
+}
+.section-title span{color:var(--cyan);}
+
+/* ── SYSTEM PANEL (ABOUT) ── */
+#about{background:var(--panel);}
+.system-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:2px;
+  background:var(--border);
+  border:1px solid var(--border);
+}
+.sys-panel{
+  background:var(--panel);
+  padding:2rem;
+}
+.sys-panel-label{
+  font-family:var(--mono);font-size:10px;
+  color:var(--muted);letter-spacing:0.2em;
+  text-transform:uppercase;
+  margin-bottom:1.25rem;
+  display:flex;align-items:center;gap:0.75rem;
+}
+.sys-panel-label::after{
+  content:'';flex:1;height:1px;background:var(--border);
+}
+.sys-bio{
+  font-family:var(--mono);font-size:13px;
+  color:var(--muted);line-height:2;
+}
+.sys-bio .hi{color:var(--text);}
+
+.readout-grid{
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:1px;background:var(--border);
+}
+.readout{
+  background:var(--panel);padding:1.25rem;
+}
+.readout-val{
+  font-family:var(--mono);font-size:1.6rem;
+  color:var(--cyan);line-height:1;
+  margin-bottom:0.25rem;
+}
+.readout-label{
+  font-family:var(--mono);font-size:10px;
+  color:var(--muted);letter-spacing:0.1em;
+  text-transform:uppercase;
+}
+
+.skill-table{width:100%;}
+.skill-row{
+  display:flex;justify-content:space-between;
+  align-items:center;
+  padding:0.75rem 0;
+  border-bottom:1px solid var(--border);
+  font-family:var(--mono);
+}
+.skill-row:last-child{border:none;}
+.skill-cat{font-size:11px;color:var(--muted);letter-spacing:0.1em;text-transform:uppercase;}
+.skill-items{font-size:12px;color:var(--cyan);letter-spacing:0.05em;}
+
+/* ── BUILDS / PROJECTS ── */
+#builds{background:var(--bg);}
+.builds-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(340px,1fr));
+  gap:2px;
+  background:var(--border);
+  border:1px solid var(--border);
+}
+.build-card{
+  background:var(--panel);
+  padding:2rem;
+  text-decoration:none;color:inherit;
+  display:flex;flex-direction:column;gap:1.25rem;
+  transition:background 0.2s;
+  position:relative;overflow:hidden;
+  cursor:crosshair;
+}
+.build-card::before{
+  content:'';
+  position:absolute;top:0;left:0;right:0;
+  height:1px;
+  background:linear-gradient(90deg,transparent,var(--cyan),transparent);
+  transform:translateX(-100%);
+  transition:transform 0.4s ease;
+}
+.build-card:hover::before{transform:translateX(0);}
+.build-card:hover{background:var(--panel2);}
+
+.build-top{
+  display:flex;justify-content:space-between;align-items:flex-start;
+}
+.build-index{
+  font-family:var(--mono);font-size:10px;
+  color:var(--muted);letter-spacing:0.2em;
+}
+.build-badge{
+  font-family:var(--mono);font-size:10px;
+  padding:2px 8px;letter-spacing:0.1em;
+  text-transform:uppercase;
+}
+.badge-live{
+  color:var(--cyan2);
+  border:1px solid rgba(0,255,204,0.4);
+  background:rgba(0,255,204,0.07);
+  animation:badgePulse 2s infinite;
+}
+@keyframes badgePulse{
+  0%,100%{box-shadow:0 0 0 0 rgba(0,255,204,0.3);}
+  50%{box-shadow:0 0 8px 2px rgba(0,255,204,0.15);}
+}
+.badge-build{
+  color:var(--amber);
+  border:1px solid rgba(255,170,0,0.3);
+  background:rgba(255,170,0,0.07);
+}
+
+.build-title{
+  font-size:1.3rem;font-weight:700;
+  letter-spacing:-0.01em;line-height:1.2;
+}
+.build-desc{
+  font-family:var(--mono);font-size:12px;
+  color:var(--muted);line-height:1.9;flex:1;
+}
+.build-footer{
+  display:flex;justify-content:space-between;align-items:center;
+  padding-top:1rem;
+  border-top:1px solid var(--border);
+}
+.build-stack{
+  display:flex;gap:0.4rem;flex-wrap:wrap;
+}
+.chip{
+  font-family:var(--mono);font-size:10px;
+  padding:2px 8px;
+  border:1px solid var(--border);
+  color:var(--muted);letter-spacing:0.05em;
+  background:rgba(0,212,255,0.03);
+}
+.build-link{
+  font-family:var(--mono);font-size:11px;
+  color:var(--cyan);letter-spacing:0.1em;
+  opacity:0;transition:opacity 0.2s;
+}
+.build-card:hover .build-link{opacity:1;}
+
+/* ── CONNECT ── */
+#connect{background:var(--panel);}
+.connect-grid{
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:4rem;align-items:start;
+}
+.connect-left h2{
+  font-size:clamp(2.5rem,6vw,5rem);
+  font-weight:700;letter-spacing:-0.02em;
+  line-height:0.95;margin-bottom:1.5rem;
+}
+.connect-left h2 span{
+  color:transparent;
+  -webkit-text-stroke:1px var(--cyan);
+}
+.connect-desc{
+  font-family:var(--mono);font-size:12px;
+  color:var(--muted);line-height:2;
+  border-left:1px solid var(--border);padding-left:1.5rem;
+  margin-bottom:2rem;
+}
+
+.social-list{
+  display:flex;flex-direction:column;gap:2px;
+  background:var(--border);border:1px solid var(--border);
+}
+.social-item{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:1.25rem 1.5rem;
+  background:var(--panel);
+  text-decoration:none;color:inherit;
+  transition:background 0.2s;
+  font-family:var(--mono);
+}
+.social-item:hover{background:var(--panel2);}
+.social-item:hover .social-handle{color:var(--cyan);}
+.social-item:hover .social-arrow{color:var(--cyan);transform:translateX(4px);}
+.social-platform{
+  font-size:10px;color:var(--muted);
+  letter-spacing:0.15em;text-transform:uppercase;
+  width:80px;
+}
+.social-handle{
+  font-size:13px;color:var(--text);
+  transition:color 0.2s;flex:1;
+}
+.social-arrow{
+  color:var(--muted);transition:all 0.2s;
+  font-size:14px;
+}
+
+.email-panel{
+  margin-top:2rem;padding:1.5rem;
+  border:1px solid var(--border);
+  background:var(--bg);
+  font-family:var(--mono);
+}
+.email-label{
+  font-size:10px;color:var(--muted);
+  letter-spacing:0.2em;text-transform:uppercase;
+  margin-bottom:0.5rem;
+}
+.email-addr{
+  font-size:14px;color:var(--cyan);
+  text-decoration:none;letter-spacing:0.05em;
+  transition:opacity 0.2s;
+}
+.email-addr:hover{opacity:0.7;}
+
+/* ── TERMINAL TICKER ── */
+.ticker{
+  position:relative;z-index:1;
+  border-top:1px solid var(--border);
+  background:rgba(0,212,255,0.03);
+  padding:0.6rem 0;
+  overflow:hidden;
+}
+.ticker-inner{
+  display:flex;gap:4rem;
+  white-space:nowrap;
+  animation:ticker 30s linear infinite;
+}
+@keyframes ticker{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+.ticker-item{
+  font-family:var(--mono);font-size:11px;
+  color:var(--muted);letter-spacing:0.1em;
+  text-transform:uppercase;
+  display:flex;align-items:center;gap:0.5rem;
+  flex-shrink:0;
+}
+.ticker-item .t-dot{
+  width:4px;height:4px;border-radius:50%;
+  background:var(--cyan);display:inline-block;
+}
+
+/* ── FOOTER ── */
+footer{
+  position:relative;z-index:1;
+  border-top:1px solid var(--border);
+  padding:1.25rem 3rem;
+  display:flex;justify-content:space-between;align-items:center;
+  font-family:var(--mono);font-size:10px;color:var(--muted);
+  letter-spacing:0.1em;flex-wrap:wrap;gap:1rem;
+}
+footer span{text-transform:uppercase;}
+
+/* ── CURSOR BLINK ── */
+.cursor{
+  display:inline-block;width:8px;height:1em;
+  background:var(--cyan);vertical-align:text-bottom;
+  animation:blink 1s step-end infinite;margin-left:2px;
+}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:0;}}
+
+/* ── RESPONSIVE ── */
+@media(max-width:900px){
+  .system-grid{grid-template-columns:1fr;}
+  .connect-grid{grid-template-columns:1fr;}
+  #hero{padding:80px 1.5rem 3rem;}
+  .section-inner{padding:4rem 1.5rem;}
+  .hero-corner.tr,.hero-corner.br{display:none;}
+  nav{padding:0 1.5rem;}
+}
+@media(max-width:600px){
+  .nav-links{display:none;}
+  .hero-meta{flex-direction:column;gap:2rem;}
+  .builds-grid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-id">
+    <div class="dot"></div>
+    BW // SYSTEM ONLINE
+  </div>
+  <ul class="nav-links">
+    <li><a href="#about">PROFILE</a></li>
+    <li><a href="#builds">BUILDS</a></li>
+    <li><a href="#connect">UPLINK</a></li>
+  </ul>
+  <div class="nav-status">
+    <span class="status-online">●</span> bradywhite.dev
+  </div>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-scan"></div>
+  <div class="hero-corner tl"></div>
+  <div class="hero-corner tr"></div>
+  <div class="hero-corner bl"></div>
+  <div class="hero-corner br"></div>
+
+  <div style="position:relative;z-index:1;">
+    <p class="hero-eyebrow">
+      [ IDENTIFYING ] &nbsp;·&nbsp; EKU // CS &nbsp;·&nbsp;
+      <span>OPERATOR : B.WHITE</span>
+    </p>
+
+    <h1 class="hero-name">
+      BRADY<br>
+      <span class="line2">WHITE.</span>
+    </h1>
+
+    <div class="hero-meta">
+      <p class="hero-desc">
+        <strong>CS student. Builder. EKU class of 2027.</strong><br>
+        I ship real software — AI tools, data dashboards,<br>
+        and whatever problem I can't stop thinking about.<br>
+        Stats minor. Eyes on data science.
+      </p>
+      <div class="hero-stats">
+        <div class="hstat">
+          <span class="hstat-label">PYTHON</span>
+          <div class="hstat-bar"><div class="hstat-fill" style="--w:85%;"></div></div>
+          <span class="hstat-val">85%</span>
+        </div>
+        <div class="hstat">
+          <span class="hstat-label">AI / API</span>
+          <div class="hstat-bar"><div class="hstat-fill" style="--w:75%;"></div></div>
+          <span class="hstat-val">75%</span>
+        </div>
+        <div class="hstat">
+          <span class="hstat-label">DATA</span>
+          <div class="hstat-bar"><div class="hstat-fill" style="--w:70%;"></div></div>
+          <span class="hstat-val">70%</span>
+        </div>
+        <div class="hstat">
+          <span class="hstat-label">WEB</span>
+          <div class="hstat-bar"><div class="hstat-fill" style="--w:65%;"></div></div>
+          <span class="hstat-val">65%</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-actions">
+      <a href="#builds" class="btn btn-primary">[ VIEW BUILDS ]</a>
+      <a href="#connect" class="btn">[ OPEN UPLINK ]</a>
+      <a href="https://github.com/bradyWhite14" target="_blank" rel="noopener" class="btn">[ GITHUB ]</a>
+    </div>
+  </div>
+</section>
+
+<!-- TICKER -->
+<div class="ticker">
+  <div class="ticker-inner">
+    <span class="ticker-item"><span class="t-dot"></span>PYTHON</span>
+    <span class="ticker-item"><span class="t-dot"></span>OPENAI API</span>
+    <span class="ticker-item"><span class="t-dot"></span>STREAMLIT</span>
+    <span class="ticker-item"><span class="t-dot"></span>SUPABASE</span>
+    <span class="ticker-item"><span class="t-dot"></span>DATA SCIENCE</span>
+    <span class="ticker-item"><span class="t-dot"></span>EKU // CS 2027</span>
+    <span class="ticker-item"><span class="t-dot"></span>JAVASCRIPT</span>
+    <span class="ticker-item"><span class="t-dot"></span>NETLIFY</span>
+    <span class="ticker-item"><span class="t-dot"></span>AVAILABLE FOR INTERNSHIP</span>
+    <span class="ticker-item"><span class="t-dot"></span>STATISTICS MINOR</span>
+    <!-- duplicate for seamless loop -->
+    <span class="ticker-item"><span class="t-dot"></span>PYTHON</span>
+    <span class="ticker-item"><span class="t-dot"></span>OPENAI API</span>
+    <span class="ticker-item"><span class="t-dot"></span>STREAMLIT</span>
+    <span class="ticker-item"><span class="t-dot"></span>SUPABASE</span>
+    <span class="ticker-item"><span class="t-dot"></span>DATA SCIENCE</span>
+    <span class="ticker-item"><span class="t-dot"></span>EKU // CS 2027</span>
+    <span class="ticker-item"><span class="t-dot"></span>JAVASCRIPT</span>
+    <span class="ticker-item"><span class="t-dot"></span>NETLIFY</span>
+    <span class="ticker-item"><span class="t-dot"></span>AVAILABLE FOR INTERNSHIP</span>
+    <span class="ticker-item"><span class="t-dot"></span>STATISTICS MINOR</span>
+  </div>
+</div>
+
+<!-- PROFILE / ABOUT -->
+<section id="about" class="section">
+  <div class="section-inner">
+    <div class="section-header">
+      <div class="section-id">
+        <span class="num">01</span>
+        <span>PROFILE</span>
+      </div>
+      <h2 class="section-title">SYSTEM <span>PROFILE</span></h2>
+    </div>
+
+    <div class="system-grid">
+      <!-- BIO -->
+      <div class="sys-panel">
+        <div class="sys-panel-label">OPERATOR BIO</div>
+        <p class="sys-bio">
+          CS freshman at <span class="hi">Eastern Kentucky University</span> — Stats minor, wired for data science.<br><br>
+          I learn by building. Not tutorials, not courses — <span class="hi">actual deployed software</span> with real users. Currently shipping AI tools and sports analytics that I'd actually use myself.<br><br>
+          Off the keyboard: lifting, reading, and filling a notebook with ideas about tech that doesn't exist yet.<span class="cursor"></span>
+        </p>
+      </div>
+
+      <!-- READOUTS -->
+      <div class="sys-panel" style="display:flex;flex-direction:column;gap:2px;padding:0;background:var(--border);">
+        <div class="readout-grid" style="flex:1;">
+          <div class="readout">
+            <div class="readout-val">2027</div>
+            <div class="readout-label">GRAD YEAR</div>
+          </div>
+          <div class="readout">
+            <div class="readout-val">CS+</div>
+            <div class="readout-label">STATS MINOR</div>
+          </div>
+          <div class="readout">
+            <div class="readout-val">3</div>
+            <div class="readout-label">LIVE BUILDS</div>
+          </div>
+          <div class="readout">
+            <div class="readout-val">∞</div>
+            <div class="readout-label">IDEAS QUEUED</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SKILLS -->
+      <div class="sys-panel" style="grid-column:1/-1;">
+        <div class="sys-panel-label">TECH STACK</div>
+        <table class="skill-table">
+          <tr class="skill-row">
+            <td class="skill-cat">LANGUAGES</td>
+            <td class="skill-items">Python &nbsp;·&nbsp; JavaScript &nbsp;·&nbsp; Java &nbsp;·&nbsp; SQL</td>
+          </tr>
+          <tr class="skill-row">
+            <td class="skill-cat">FRAMEWORKS</td>
+            <td class="skill-items">Streamlit &nbsp;·&nbsp; React &nbsp;·&nbsp; HTML / CSS</td>
+          </tr>
+          <tr class="skill-row">
+            <td class="skill-cat">AI / DATA</td>
+            <td class="skill-items">OpenAI API &nbsp;·&nbsp; ChatGPT API &nbsp;·&nbsp; Pandas &nbsp;·&nbsp; Statistics</td>
+          </tr>
+          <tr class="skill-row">
+            <td class="skill-cat">INFRA</td>
+            <td class="skill-items">Supabase &nbsp;·&nbsp; Netlify &nbsp;·&nbsp; Git &nbsp;·&nbsp; GitHub</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BUILDS -->
+<section id="builds" class="section">
+  <div class="section-inner">
+    <div class="section-header">
+      <div class="section-id">
+        <span class="num">02</span>
+        <span>BUILDS</span>
+      </div>
+      <h2 class="section-title">ACTIVE <span>BUILDS</span></h2>
+    </div>
+
+    <div class="builds-grid">
+
+      <!-- AI RECEPTIONIST -->
+      <a href="#" class="build-card">
+        <div class="build-top">
+          <span class="build-index">PROJECT // 001</span>
+          <span class="build-badge badge-live">● LIVE</span>
+        </div>
+        <h3 class="build-title">AI Receptionist</h3>
+        <p class="build-desc">
+          Conversational scheduling widget that books appointments through natural language.
+          Powered by the OpenAI API — users describe what they need,
+          the assistant handles it. All data persisted to Supabase.
+          Deployed and live on Netlify.
+        </p>
+        <div class="build-footer">
+          <div class="build-stack">
+            <span class="chip">OpenAI API</span>
+            <span class="chip">Supabase</span>
+            <span class="chip">Netlify</span>
+          </div>
+          <span class="build-link">LAUNCH →</span>
+        </div>
+      </a>
+
+      <!-- UK DASHBOARD -->
+      <a href="https://github.com/bradyWhite14" target="_blank" rel="noopener" class="build-card">
+        <div class="build-top">
+          <span class="build-index">PROJECT // 002</span>
+          <span class="build-badge badge-build">IN FIELD</span>
+        </div>
+        <h3 class="build-title">Kentucky Wildcats Dashboard</h3>
+        <p class="build-desc">
+          Live NCAA stats dashboard for UK Basketball.
+          Pulls real game data and renders it through an interactive
+          Streamlit interface — built for anyone who actually wants to
+          understand what the numbers say.
+        </p>
+        <div class="build-footer">
+          <div class="build-stack">
+            <span class="chip">Python</span>
+            <span class="chip">Streamlit</span>
+            <span class="chip">NCAA Data</span>
+          </div>
+          <span class="build-link">VIEW →</span>
+        </div>
+      </a>
+
+      <!-- RESUME ROASTER -->
+      <a href="https://github.com/bradyWhite14" target="_blank" rel="noopener" class="build-card">
+        <div class="build-top">
+          <span class="build-index">PROJECT // 003</span>
+          <span class="build-badge badge-build">IN FIELD</span>
+        </div>
+        <h3 class="build-title">Resume Roaster</h3>
+        <p class="build-desc">
+          Upload your resume, get destroyed — in a useful way.
+          ChatGPT API reads it and delivers blunt, actionable feedback
+          on everything that would get you filtered out.
+          No fluff. No participation trophy.
+        </p>
+        <div class="build-footer">
+          <div class="build-stack">
+            <span class="chip">ChatGPT API</span>
+            <span class="chip">Python</span>
+            <span class="chip">PDF Parsing</span>
+          </div>
+          <span class="build-link">VIEW →</span>
+        </div>
+      </a>
+
+    </div>
+  </div>
+</section>
+
+<!-- UPLINK / CONNECT -->
+<section id="connect" class="section">
+  <div class="section-inner">
+    <div class="section-header">
+      <div class="section-id">
+        <span class="num">03</span>
+        <span>UPLINK</span>
+      </div>
+      <h2 class="section-title">OPEN <span>UPLINK</span></h2>
+    </div>
+
+    <div class="connect-grid">
+      <div class="connect-left">
+        <h2>LET'S<br><span>BUILD.</span></h2>
+        <p class="connect-desc">
+          Open to internships, collaborations,<br>
+          and conversations about data, AI,<br>
+          and whatever problem is worth solving.<br>
+          &nbsp;<br>
+          I respond fast. No fluff.
+        </p>
+        <div class="email-panel">
+          <div class="email-label">DIRECT UPLINK</div>
+          <a href="mailto:brady@bradywhite.dev" class="email-addr">brady@bradywhite.dev</a>
+        </div>
+      </div>
+
+      <div>
+        <div class="social-list">
+          <a href="https://twitter.com/brady15white" target="_blank" rel="noopener" class="social-item">
+            <span class="social-platform">TWITTER</span>
+            <span class="social-handle">@brady15white</span>
+            <span class="social-arrow">→</span>
+          </a>
+          <a href="https://github.com/bradyWhite14" target="_blank" rel="noopener" class="social-item">
+            <span class="social-platform">GITHUB</span>
+            <span class="social-handle">bradyWhite14</span>
+            <span class="social-arrow">→</span>
+          </a>
+          <a href="https://www.linkedin.com/in/brady-white-086680329" target="_blank" rel="noopener" class="social-item">
+            <span class="social-platform">LINKEDIN</span>
+            <span class="social-handle">Brady White</span>
+            <span class="social-arrow">→</span>
+          </a>
+          <a href="https://youtube.com/@bradywhite" target="_blank" rel="noopener" class="social-item">
+            <span class="social-platform">YOUTUBE</span>
+            <span class="social-handle">@bradywhite</span>
+            <span class="social-arrow">→</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <span>© 2025 Brady White &nbsp;//&nbsp; bradywhite.dev</span>
+  <span>EKU &nbsp;·&nbsp; Lawrenceburg, KY</span>
+  <span>SYSTEM NOMINAL</span>
+</footer>
+
+</body>
+</html>
